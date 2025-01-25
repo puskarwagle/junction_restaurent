@@ -25,6 +25,34 @@
         <link href="https://cdn.jsdelivr.net/npm/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
         <link rel="icon" type="image/webp" href="assets/images/header/logo.jpeg">
 
+        <style>
+            #wagledatefix::-webkit-calendar-picker-indicator {
+                background: transparent;
+                bottom: 0;
+                color: transparent;
+                cursor: pointer;
+                height: auto;
+                left: 0;
+                position: absolute;
+                right: 0;
+                top: 0;
+                width: auto;
+            }
+            
+            .oldPrice::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: #4a6d60;
+                transform: translate(1%, 800%) rotate(15deg);
+                height: 3px;
+                width: 100%;
+                z-index: 1;
+            }
+        </style>
         <title>{{ $title ?? 'Wagle' }}</title>
         @livewireStyles
     </head>

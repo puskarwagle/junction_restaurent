@@ -33,27 +33,27 @@
                         <div class="single-special-menu-content">
                             <div class="row">
                                 @foreach ($items as $menuItem)
-                                    <div class="col-lg-6 col-md-6">
+                                    <div class="col-lg-6 col-md-6" wire:click="updateCartCounter({{ $menuItem->id }})" wire:ignore>
                                         <div class="special-card shop-area">
                                             <div class="row align-items-center">
                                                 <div class="col-lg-3 col-4 single-shop-cart">
                                                     <div class="special-menu-img">
-                                                        <a href="menu-details.html">
-                                                            <img src="{{ $menuItem->image_path }}" alt="images">
-                                                        </a>
+                                                        <img src="{{ $menuItem->image_path }}" alt="images">
                                                     </div>
                                                 </div>
                                                 <div class="col-lg-6 col-6">
                                                     <div class="special-menu-text">
-                                                        <a href="menu-details.html">
-                                                            <h3>{{ $menuItem->name }}</h3>
-                                                        </a>
+                                                        <h3>{{ $menuItem->id }}</h3>
+                                                        <h3>{{ $menuItem->name }}</h3>
                                                         <p>{{ $menuItem->description }}</p>
                                                     </div>
                                                 </div>
                                                 <div class="col-lg-3 col-2">
                                                     <div class="special-menu-number">
-                                                        <span>${{ number_format($menuItem->price, 2) }}</span>
+                                                        <span class="oldPrice">${{ number_format($menuItem->price, 2) }}</span>
+                                                    </div>
+                                                    <div class="special-menu-number">
+                                                        <span>${{ number_format($menuItem->discount, 2) }}</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -67,4 +67,27 @@
             </div>
         </div>
     </div>
+<!-- <script>
+    let activeTab = 'first-tab'; // Variable to store the active tab
+
+    document.addEventListener('DOMContentLoaded', function () {
+        // Set the initial active tab based on the variable
+        document.querySelector(`#${activeTab}`).classList.add('active');
+        document.querySelector(`#${activeTab}-pane`).classList.add('show', 'active');
+
+        // Update active tab when a tab is clicked
+        document.querySelectorAll('.nav-link').forEach(tab => {
+            tab.addEventListener('click', function () {
+                // Remove active class from previously active tab
+                document.querySelector(`#${activeTab}`).classList.remove('active');
+                document.querySelector(`#${activeTab}-pane`).classList.remove('show', 'active');
+
+                // Update the active tab variable and classes
+                activeTab = this.id;
+                document.querySelector(`#${activeTab}`).classList.add('active');
+                document.querySelector(`#${activeTab}-pane`).classList.add('show', 'active');
+            });
+        });
+    });
+</script> -->
 </div>

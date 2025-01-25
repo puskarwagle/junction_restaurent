@@ -38,7 +38,7 @@
                             </li>
 
                             <li class="nav-item nav-item-five">
-                                <a href="/about" wire:navigate.hover class="nav-link dropdown-toggle">About Us</a>
+                                <a href="/about" wire:navigate.hover class="nav-link dropdown-toggle">About</a>
                             </li>
 
                             <li class="nav-item nav-item-five">
@@ -56,7 +56,7 @@
                                 <div class="shapping-bag">
                                     <img src="assets/images/header/shopping-bag-icon.svg" alt="images">
                                     <div class="shapping-text">
-                                        01
+                                        {{ $cartCount }}
                                     </div>
                                 </div>
                             </a>
@@ -108,7 +108,7 @@
                                         <img src="assets/images/header/shopping-bag-icon.svg" alt="images">
                                     </a>
                                     <div class="shapping-text">
-                                        01
+                                        {{ $cartCount }}
                                     </div>
                                 </div>
                             </div>
@@ -124,4 +124,3 @@
         </div>
     </div>
 </header>
-

@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+
+use App\Livewire\Frontend\Home;
 use App\Livewire\Frontend\About;
 use App\Livewire\Frontend\Contact;
 use App\Livewire\Frontend\Menu;

@@ -10,7 +10,7 @@
                         <p data-cue="slideInUp" data-duration="2000">
                             On the other hand, we denounce with righteous indignation and dislike men who are so beguiled item demoralized by the charms of pleasure of the moment with a righteous hand, we denounce with righteous indignation.
                         </p>
-                        <a href="\aboutus" class="default-btn" data-cue="slideInUp" data-duration="2500">Read More</a>
+                        <a href="\about" wire:navigate.hover class="default-btn" data-cue="slideInUp" data-duration="2500">Read More</a>
                     </div>
                 </div>
                 <div class="col-lg-6" data-cue="zoomIn" data-duration="2000">
