@@ -52,6 +52,10 @@
                 width: 100%;
                 z-index: 1;
             }
+            .selected {
+                background-color: rgba(0, 255, 0, 0.1); /* Light green tint */
+                border: 2px solid red; /* Optional: Add a border for better visibility */
+            }
         </style>
         <title>{{ $title ?? 'Wagle' }}</title>
         @livewireStyles
@@ -70,7 +74,8 @@
     </footer>
 
     <!--=== Link Of JS Fils ===-->
-    <script data-cfasync="false" src="../../cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="assets/js/jquery.min.js"></script>
+    <!-- <script data-cfasync="false" src="../../cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"> -->
+    </script><script src="assets/js/jquery.min.js"></script>
     <script src="assets/js/meanmenu.min.js"></script>
     <script src="assets/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/scrollCue.min.js"></script>
