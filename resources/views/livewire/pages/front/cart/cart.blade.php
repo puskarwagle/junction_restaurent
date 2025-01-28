@@ -94,7 +94,8 @@
                         <span class="cart-number-2">${{ number_format($total, 2) }}</span>
                     </li>
                 </ul>
-                <a href="checkout.html" class="default-btn">Proceed To Checkout<span></span></a>
+                <!-- <a href="/checkout" wire:navigate class="default-btn">Proceed To Checkout<span></span></a> -->
+                <button wire:click="goToCheckout" class="btn btn-primary">Proceed to Checkout</button>
             </div>
         </div>
     </div>
