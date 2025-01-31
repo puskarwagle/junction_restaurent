@@ -29,9 +29,9 @@ Route::get('/fromOurMenu', FromOurMenu::class);
 //Backend uses
 use App\Livewire\Backend\MenuManagement;
 use App\Livewire\Backend\AdminManagement;
-use App\Livewire\TestCrud\TestCrudController;
 
-Route::view(uri: 'dashboard', view: 'dashboard')
+// Backend Routes
+Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
@@ -43,20 +43,11 @@ Route::get('menuitems', MenuManagement::class)
     ->middleware(['auth'])
     ->name('menuitems');
 
-// Route::get('users', AdminManagement::class)
-//     ->middleware(['auth'])
-//     ->name('users');
-
 Route::get('users', AdminManagement::class)
     ->middleware(['auth'])
     ->name('users');
-        
-        
-Route::get('test-cruds', TestCrudController::class)
-    ->middleware(['auth'])
-    ->name('test-cruds');
-        
-        
+
+
 
 
 require __DIR__.'/auth.php';

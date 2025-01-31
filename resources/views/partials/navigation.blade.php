@@ -36,13 +36,11 @@ $logout = function (Logout $logout) {
                 </div>
 
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('test-cruds')" :active="request()->routeIs('test-cruds')" wire:navigate>
+                    <x-nav-link :href="route('test-cruds.index')" :active="request()->routeIs('test-cruds.index')" wire:navigate>
                         {{ __('TestCruds') }}
                     </x-nav-link>
                 </div>
-
-                
-            </div>
+                   
 
             <!-- Hamburger -->
             <div class="-me-2 flex items-center sm:hidden">
@@ -121,12 +119,12 @@ $logout = function (Logout $logout) {
         </div>
 
         <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('test-cruds')" :active="request()->routeIs('test-cruds')" wire:navigate>
+            <x-responsive-nav-link :href="route('test-cruds.index')" :active="request()->routeIs('test-cruds.index')" wire:navigate>
                 {{ __('TestCruds') }}
             </x-responsive-nav-link>
         </div>
-
-
+     
+        
         <!-- Responsive Settings Options -->
         <div class="pt-4 pb-1 border-t border-gray-200 dark:border-gray-600">
             <div class="px-4">

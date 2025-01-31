@@ -30,10 +30,20 @@ class TestCrudController extends Component
     {
         Log::info('mount function called');
         try {
-            $this->{Str::camel(Str::plural('TestCrud'))} = TestCrud::all();
+            // Dynamically set the property name (e.g., "testCruds" for "TestCrud")
+            $propertyName = lcfirst('TestCrud') . 's';
+            
+            // Fetch all records from the model
+            $this->{$propertyName} = TestCrud::all();
         } catch (Exception $e) {
-            Log::error('Failed to fetch ' . Str::plural('TestCrud') . ': ' . $e->getMessage());
+            Log::error("Failed to fetch TestCrud records: " . $e->getMessage());
         }
     }
-
+    
+    public function render()
+    {
+        Log::info('render function called');
+        return view('TestCrud-cruds')
+            ->layout('layouts.app');
+    }
 }
