@@ -40,7 +40,9 @@ class NavigationUpdater
 
         $content = File::get($navFilePath);
 
-        if (Str::contains($content, "route('$routeName.index')")) {
+        // Check if the desktop navigation link already exists
+        if (Str::contains($content, "route('$routeName')")) {
+            Log::info("Navigation link for $routeLabel already exists in navigation.blade.php.");
             return;
         }
 

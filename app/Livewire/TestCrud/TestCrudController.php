@@ -23,7 +23,14 @@ class TestCrudController extends Component
     public $description;
 
     protected $rules = [
-        
+        'name' => '',
+        'phone' => '',
+        'persons' => '',
+        'date' => '',
+        'time' => '',
+        'price' => '',
+        'image_path' => '',
+        'description' => ''
     ];
 
     public function mount()

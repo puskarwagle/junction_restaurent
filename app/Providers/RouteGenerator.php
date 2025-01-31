@@ -41,6 +41,12 @@ EOD;
         // Read the existing content
         $content = File::get($webFilePath);
 
+        // Check if the route already exists
+        if (Str::contains($content, "Route::get('$routeUri'")) {
+            Log::info("Route for $routeName already exists in web.php.");
+            return;
+        }
+
         // Find the last occurrence of "Route::get" that is not commented out
         $lastRouteGetPos = $this->findLastRouteGet($content);
 
@@ -63,24 +69,26 @@ EOD;
             0
         );
 
-        // Add the use statement for the controller
+        // Add the use statement for the controller if it doesn't already exist
         $useStatement = "use $controllerClass;";
-        $lastUsePos = strrpos($content, 'use App\Livewire');
+        if (!Str::contains($content, $useStatement)) {
+            $lastUsePos = strrpos($content, 'use App\Livewire');
 
-        if ($lastUsePos === false) {
-            // If no use statement for Livewire exists, add it at the top
-            $content = "<?php\n\n$useStatement\n\n" . ltrim($content, "<?php\n");
-        } else {
-            // Find the end of the last use statement line
-            $lastUseEndPos = strpos($content, "\n", $lastUsePos);
+            if ($lastUsePos === false) {
+                // If no use statement for Livewire exists, add it at the top
+                $content = "<?php\n\n$useStatement\n\n" . ltrim($content, "<?php\n");
+            } else {
+                // Find the end of the last use statement line
+                $lastUseEndPos = strpos($content, "\n", $lastUsePos);
 
-            // Insert the new use statement after the last use statement
-            $content = substr_replace(
-                $content,
-                "\n" . $useStatement,
-                $lastUseEndPos + 1,
-                0
-            );
+                // Insert the new use statement after the last use statement
+                $content = substr_replace(
+                    $content,
+                    "\n" . $useStatement,
+                    $lastUseEndPos + 1,
+                    0
+                );
+            }
         }
 
         // Write the updated content back to the file
