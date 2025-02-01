@@ -31,6 +31,7 @@ use App\Livewire\Backend\MenuManagement;
 use App\Livewire\Backend\AdminManagement;
 use App\Livewire\TestCrud\TestCrudController;
 
+use App\Livewire\SiteSettings\SiteSettingsController;
 Route::view(uri: 'dashboard', view: 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
@@ -52,10 +53,14 @@ Route::get('users', AdminManagement::class)
     ->name('users');
         
         
-Route::get('test-cruds', TestCrudController::class)
+Route::get('test_cruds', TestCrudController::class)
     ->middleware(['auth'])
-    ->name('test-cruds');
+    ->name('test_cruds');
         
+        
+Route::get('site_settings', SiteSettingsController::class)
+    ->middleware(['auth'])
+    ->name('site_settings');
         
 
 
