@@ -1,21 +1,24 @@
 <?php
 
-namespace App\Livewire\SiteSettings;
+namespace App\Livewire;
 
 use Livewire\Attributes\Layout;
-use App\Models\SiteSettings;
+use App\Models\PostOffice;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\WithFileUploads;
 use Exception;
 use Illuminate\Support\Facades\Log;
 
-class SiteSettingsController extends Component
+class PostOfficeController extends Component
 {
     use WithFileUploads, WithPagination;
 
-    public $key;
-    public $value;
+    public $title;
+    public $excerpt;
+    public $body;
+    public $featured;
+    public $post_image;
 
     public $search = '';
     public $sortField = 'id';
@@ -23,8 +26,11 @@ class SiteSettingsController extends Component
     public $perPage = 10;
 
     protected $rules = [
-        'key' => '',
-        'value' => ''
+        'title' => '',
+        'excerpt' => '',
+        'body' => '',
+        'featured' => '',
+        'post_image' => ''
     ];
 
     public function mount()
@@ -46,11 +52,11 @@ class SiteSettingsController extends Component
     public function read()
     {
         // Dynamically retrieve fillable fields from the model
-        $modelInstance = new SiteSettings;
+        $modelInstance = new PostOffice;
         $fillable = $modelInstance->getFillable();
 
         // Build the query
-        $query = SiteSettings::query();
+        $query = PostOffice::query();
 
         // Apply filtering if a search term is provided
         if (!empty($this->search)) {
@@ -94,7 +100,7 @@ class SiteSettingsController extends Component
     {
         Log::info('render function called');
         $data = $this->read();
-        return view('SiteSettings-cruds', [
+        return view('PostOffice-cruds', [
             'tabledata' => $data['tabledata'],
             'pagination' => $data['pagination'],
             'sort' => $data['sort'],

@@ -29,7 +29,7 @@ class CrudControllerGenerator
         $rulesString = implode(",\n        ", array_map(fn($f) => "'$f' => ''", $fillables));
 
         // Generate the view name dynamically
-        $viewName = $model;
+        $viewName = Str::plural($model); // Convert model name to kebab-case for the view file
         $layoutName = 'layouts.app'; // Default layout, can be customized if needed
 
         File::ensureDirectoryExists($controllerPath);
@@ -38,18 +38,24 @@ class CrudControllerGenerator
 
 namespace $namespaceForThisFile;
 
-use Livewire\Attributes\Layout;
+use Livewire\\Attributes\\Layout;
 use $modelImportPath;
-use Livewire\Component;
-use Livewire\WithFileUploads;
+use Livewire\\Component;
+use Livewire\\WithPagination;
+use Livewire\\WithFileUploads;
 use Exception;
-use Illuminate\Support\Facades\Log;
+use Illuminate\\Support\\Facades\\Log;
 
 class $controllerClass extends Component
 {
-    use WithFileUploads;
+    use WithFileUploads, WithPagination;
 
     $properties
+
+    public \$search = '';
+    public \$sortField = 'id';
+    public \$sortDirection = 'asc';
+    public \$perPage = 10;
 
     protected \$rules = [
         $rulesString
@@ -58,22 +64,76 @@ class $controllerClass extends Component
     public function mount()
     {
         Log::info('mount function called');
-        try {
-            // Dynamically set the property name (e.g., "testCruds" for "TestCrud")
-            \$propertyName = lcfirst('$model') . 's';
-            
-            // Fetch all records from the model
-            \$this->{\$propertyName} = $model::all();
-        } catch (Exception \$e) {
-            Log::error("Failed to fetch $model records: " . \$e->getMessage());
+        // Any initialization can be added here if needed.
+    }
+
+    public function sortBy(\$field)
+    {
+        if (\$this->sortField === \$field) {
+            \$this->sortDirection = \$this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            \$this->sortField = \$field;
+            \$this->sortDirection = 'asc';
         }
     }
-    
+
+    public function read()
+    {
+        // Dynamically retrieve fillable fields from the model
+        \$modelInstance = new $model;
+        \$fillable = \$modelInstance->getFillable();
+
+        // Build the query
+        \$query = $model::query();
+
+        // Apply filtering if a search term is provided
+        if (!empty(\$this->search)) {
+            \$query->where(function(\$q) use (\$fillable) {
+                foreach (\$fillable as \$field) {
+                    \$q->orWhere(\$field, 'like', '%' . \$this->search . '%');
+                }
+            });
+        }
+
+        // Apply sorting
+        \$query->orderBy(\$this->sortField, \$this->sortDirection);
+
+        // Return paginated results as an array
+        \$paginatedResults = \$query->paginate(\$this->perPage);
+
+        // Dynamically get the columns and their data
+        \$tabledata = \$paginatedResults->map(function (\$item) {
+            return \$item->toArray(); // Convert each item to an array
+        });
+
+        return [
+            'tabledata' => \$tabledata, 
+            'pagination' => [
+                'current_page' => \$paginatedResults->currentPage(),
+                'per_page' => \$paginatedResults->perPage(),
+                'total' => \$paginatedResults->total(),
+                'last_page' => \$paginatedResults->lastPage(),
+            ],
+            'sort' => [
+                'field' => \$this->sortField,
+                'direction' => \$this->sortDirection,
+            ],
+            'search' => [
+                'term' => \$this->search,
+            ],
+        ];
+    }
+
     public function render()
     {
         Log::info('render function called');
-        return view('$viewName-cruds')
-            ->layout('$layoutName');
+        \$data = \$this->read();
+        return view('$viewName-cruds', [
+            'tabledata' => \$data['tabledata'],
+            'pagination' => \$data['pagination'],
+            'sort' => \$data['sort'],
+            'search' => \$data['search'],
+        ])->layout('$layoutName');
     }
 }
 EOD);

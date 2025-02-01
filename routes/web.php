@@ -30,8 +30,9 @@ Route::get('/fromOurMenu', FromOurMenu::class);
 use App\Livewire\Backend\MenuManagement;
 use App\Livewire\Backend\AdminManagement;
 use App\Livewire\TestCrud\TestCrudController;
-
 use App\Livewire\SiteSettings\SiteSettingsController;
+use App\Livewire\PostOfficeController;
+
 Route::view(uri: 'dashboard', view: 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
@@ -52,16 +53,16 @@ Route::get('users', AdminManagement::class)
     ->middleware(['auth'])
     ->name('users');
         
-        
 Route::get('test_cruds', TestCrudController::class)
     ->middleware(['auth'])
     ->name('test_cruds');
         
-        
 Route::get('site_settings', SiteSettingsController::class)
     ->middleware(['auth'])
     ->name('site_settings');
-        
 
+Route::get('post_office', PostOfficeController::class)
+    ->middleware(['auth'])
+    ->name('post_office');
 
 require __DIR__.'/auth.php';

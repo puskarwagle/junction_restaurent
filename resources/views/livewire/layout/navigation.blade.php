@@ -47,7 +47,11 @@ $logout = function (Logout $logout) {
                     </x-nav-link>
                 </div>
 
-                
+                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                    <x-nav-link :href="route('post_office')" :active="request()->routeIs('post_office')" wire:navigate>
+                        {{ __('postOffice') }}
+                    </x-nav-link>
+                </div>
             </div>
 
             <!-- Hamburger -->
@@ -137,6 +141,7 @@ $logout = function (Logout $logout) {
                 {{ __('SiteSettings') }}
             </x-responsive-nav-link>
         </div>
+
 
 
         <!-- Responsive Settings Options -->

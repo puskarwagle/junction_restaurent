@@ -13,4 +13,3 @@ class SiteSettings extends Model
 
     protected $fillable = ['key', 'value'];
 }
-//jlk

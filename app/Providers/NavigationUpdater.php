@@ -11,7 +11,7 @@ class NavigationUpdater
     public function update($model, $viewsPath)
     {
         $navFilePath = "$viewsPath/livewire/layout/navigation.blade.php";
-        $routeName = Str::kebab(Str::plural($model));
+        $routeName = Str::snake(Str::plural($model));
         $routeLabel = Str::plural($model);
 
         $desktopRouteLink = <<<EOD
