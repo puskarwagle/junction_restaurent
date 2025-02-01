@@ -46,12 +46,19 @@ $logout = function (Logout $logout) {
                         {{ __('SiteSettings') }}
                     </x-nav-link>
                 </div>
-
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('post_office')" :active="request()->routeIs('post_office')" wire:navigate>
-                        {{ __('postOffice') }}
+                
+                <div>
+                    <x-nav-link :href="route('post_offices')" :active="request()->routeIs('post_offices')" wire:navigate>
+                        {{ __('PostOffices') }}
                     </x-nav-link>
                 </div>
+<div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+    <x-nav-link :href="route('order_items')" :active="request()->routeIs('order_items')" wire:navigate>
+        {{ __('OrderItems') }}
+    </x-nav-link>
+</div>
+
+
             </div>
 
             <!-- Hamburger -->
@@ -141,6 +148,17 @@ $logout = function (Logout $logout) {
                 {{ __('SiteSettings') }}
             </x-responsive-nav-link>
         </div>
+
+        <div>
+            <x-responsive-nav-link :href="route('post_offices')" :active="request()->routeIs('post_offices')" wire:navigate>
+                {{ __('PostOffices') }}
+            </x-responsive-nav-link>
+        </div>
+<div class="pt-2 pb-3 space-y-1">
+    <x-responsive-nav-link :href="route('order_items')" :active="request()->routeIs('order_items')" wire:navigate>
+        {{ __('OrderItems') }}
+    </x-responsive-nav-link>
+</div>
 
 
 

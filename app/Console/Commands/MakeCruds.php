@@ -6,7 +6,7 @@ use Illuminate\Console\Command;
 use App\Providers\CrudControllerGenerator;
 use App\Providers\CrudViewGenerator;
 use App\Providers\NavigationUpdater;
-use App\Providers\RouteGenerator;
+use App\Providers\RouteUpdater;
 
 use Exception;
 use Illuminate\Support\Str;
@@ -25,106 +25,121 @@ class MakeCruds extends Command
     public function handle(): void
     {
         $this->info('Hey pyaro manis!');
-
+    
         // Get a list of available models
         $models = collect(\File::files(app_path('Models')))
             ->map(fn($file) => $file->getFilenameWithoutExtension())
             ->toArray();
-
-        if (empty($models)) {
-            $this->error('No models found in the App\Models directory.\n');
-            return;
-        }
-
+    
         // Step 1: Ask the user to choose a model
         $model = $this->choice('Select a model to generate CRUD for:', $models);
-
+    
         // Define paths for controller and views
-        // $controllerPath = $this->testControllerPath;
-        // $viewsPath = $this->testViewsPath;
-        $controllerPath = $this->ask('Enter the controller path (default: app/Livewire/)', 'app/Livewire/');
+        $controllerPath = $this->ask('Enter the controller path (default: app/Livewire/)', 'app/Livewire');
         $viewsPath = $this->ask('Enter the views path (default: resources/views)', 'resources/views');
-
+    
         // Generate the fully qualified controller class name
         $controllerClass = str_replace('/', '\\', ucfirst($controllerPath)) . '\\' . $model . 'Controller';
         $controllerFile = base_path($controllerPath . '/' . $model . 'Controller.php');
         $viewFile = ($viewsPath . '/' . $model . '-cruds.blade.php');
-
+    
         try {
-            // Step 2: Check and generate controller
-            $controllerGenerator = new CrudControllerGenerator();
-            if (file_exists($controllerFile)) {
-                $this->info("🔥 Controller already exists at $controllerFile.");
-                if ($this->confirm('Do you want to replace it?', false)) {
-                    $this->info("Generating controller for $model...");
-                    $controllerGenerator->generate($model, $controllerPath);
-                    $this->info("✅ Controller generated successfully for $model.\n");
-                } else {
-                    $this->info("Skipping controller generation for $model.\n");
-                }
+            // Step 2: Check if the model exists in the database
+            $modelClass = 'App\\Models\\' . $model;
+            $tableName = (new $modelClass)->getTable();
+    
+            if (!\Schema::hasTable($tableName)) {
+                $this->info("Table for model $model does not exist. Creating table...");
+    
+                // Get fillable attributes from the model
+                $reflectionClass = new \ReflectionClass($modelClass);
+                $fillable = $reflectionClass->getProperty('fillable')->getValue(new $modelClass);
+    
+                // Create the table
+                \Schema::create($tableName, function ($table) use ($fillable) {
+                    $table->id();
+                    foreach ($fillable as $column) {
+                        $table->string($column)->nullable();
+                    }
+                    $table->timestamps();
+                });
+    
+                $this->info("✅ Table created successfully for $model.");
             } else {
-                $this->info("Generating controller for $model...");
-                $controllerGenerator->generate($model, $controllerPath);
-                $this->info("✅ Controller generated successfully for $model.\n");
+                $this->info("✅ Table already exists for $model.");
             }
-
-
-            // Step 3: Check and generate view
-            $viewGenerator = new CrudViewGenerator();
-            if (file_exists($viewFile)) {
-                $this->info("🔥 View already exists at $viewFile.");
-                if ($this->confirm('Do you want to replace it?', false)) {
-                    $this->info("Generating view for $model...");
-                    $viewGenerator->generate($model, $viewsPath); // Call the view generator
-                    $this->info("✅ View generated successfully for $model.\n");
-                } else {
-                    $this->info("Skipping view generation for $model.\n");
-                }
-            } else {
-                $this->info("$viewFile file does not exist. Generating view for $model...");
-                $viewGenerator->generate($model, $viewsPath); // Call the view generator
-                $this->info("✅ View generated successfully for $model.\n");
-            }
-
-
-            // Step 4: Check and update navigation
+    
+            // Step 3: Generate Controller (simplified)
+            $this->generateFile(
+                $controllerFile,
+                fn() => (new CrudControllerGenerator())->generate($model, $controllerPath),
+                "🔥 Controller already exists at $controllerFile.",
+                "Generating controller for $model...",
+                "✅ Controller generated successfully for $model.\n"
+            );
+    
+            // Step 4: Generate View (simplified)
+            $this->generateFile(
+                $viewFile,
+                fn() => (new CrudViewGenerator())->generate($model, $viewsPath),
+                "🔥 View already exists at $viewFile.",
+                "Generating view for $model...",
+                "✅ View generated successfully for $model.\n"
+            );
+    
+            // Step 5: Check and update navigation
             $navigationUpdater = new NavigationUpdater();
-            $navFilePath = "$viewsPath/livewire/layout/navigation.blade.php";
-            if (file_exists($navFilePath)) {
-                $this->info("🔥 Navigation file already exists at $navFilePath.");
-                if ($this->confirm('Do you want to update it?', false)) {
-                    $this->info("Updating navigation for $model...");
-                    $navigationUpdater->update($model, $viewsPath);
-                    $this->info("✅ Navigation updated successfully for $model.\n");
-                } else {
-                    $this->info("Skipping navigation update for $model.\n");
-                }
+            $result = $navigationUpdater->update($model, $viewsPath);
+    
+            if ($result) {
+                $this->info("✅ Navigation updated successfully for $model.");
             } else {
-                $this->info("Navigation file does not exist. Skipping navigation update for $model.\n");
+                $this->info("⚠️ Navigation update skipped or failed for $model.");
             }
-
-            // Step 5: Check and update routes
+    
+            // Step 6: Check and update routes
             $routeUpdater = new RouteUpdater();
-            $webFilePath = base_path('routes/web.php');
-            if (file_exists($webFilePath)) {
-                $this->info("🔥 Routes file already exists at $webFilePath.");
-                if ($this->confirm('Do you want to update it?', false)) {
-                    $this->info("Updating routes for $model...");
-                    $routeUpdater->addRoute($model, $controllerClass);
-                    $this->info("✅ Route added successfully for $model.\n");
-                } else {
-                    $this->info("Skipping route update for $model.\n");
-                }
+            $result = $routeUpdater->addRoute($model, $controllerClass);
+    
+            if ($result) {
+                $this->info("✅ Route added successfully for $model.");
             } else {
-                $this->info("Routes file does not exist. Skipping route update for $model.\n");
+                $this->info("⚠️ Route already exists or update failed for $model.");
             }
-
+    
             // Final Success Message
             $this->info("🎉 ✨ CRUD generation completed for $model. 🚀 🎯");
         } catch (Exception $e) {
             // Handle any errors that occur during the process
             $this->error("✨ An error occurred 🚨: " . $e->getMessage());
             Log::error("Error in MakeCruds command: " . $e->getMessage());
+        }
+    }
+    
+    /**
+     * Helper function to generate a file if it doesn't exist or if the user confirms replacement.
+     *
+     * @param string $filePath The path to the file.
+     * @param callable $generator The function to generate the file.
+     * @param string $existsMessage The message to display if the file already exists.
+     * @param string $generateMessage The message to display when generating the file.
+     * @param string $successMessage The message to display after successful generation.
+     */
+    protected function generateFile(string $filePath, callable $generator, string $existsMessage, string $generateMessage, string $successMessage): void
+    {
+        if (file_exists($filePath)) {
+            $this->info($existsMessage);
+            if ($this->confirm('Do you want to replace it?', false)) {
+                $this->info($generateMessage);
+                $generator();
+                $this->info($successMessage);
+            } else {
+                $this->info("Skipping file generation for $filePath.\n");
+            }
+        } else {
+            $this->info("$filePath file does not exist. $generateMessage");
+            $generator();
+            $this->info($successMessage);
         }
     }
 }

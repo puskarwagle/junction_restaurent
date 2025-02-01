@@ -29,7 +29,7 @@ class CrudControllerGenerator
         $rulesString = implode(",\n        ", array_map(fn($f) => "'$f' => ''", $fillables));
 
         // Generate the view name dynamically
-        $viewName = Str::plural($model); // Convert model name to kebab-case for the view file
+        $viewName = $model; 
         $layoutName = 'layouts.app'; // Default layout, can be customized if needed
 
         File::ensureDirectoryExists($controllerPath);
