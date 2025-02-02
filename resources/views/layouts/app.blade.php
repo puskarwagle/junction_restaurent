@@ -33,43 +33,76 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
         <style>
-            /* Custom styles for the navigation container */
-            .nav-container {
-                display: flex;
-                border:0px solid blue;
-            }
-            /* Full height and flexible layout for the nav */
-            .nav-flex-container {
-                display: flex;
-                justify-content: space-between;
-                border:0px solid orange;
-                width: 100%;
-            }
-            .junctyfy {
+            .header {
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
                 border:0px solid red;
-                min-width:86%;
-                padding: 1rem;
-            }
-            /* Sidebar styles */
-            .sidebar {
-                display: flex;
-                flex-direction: column;
-                align-items: flex-start;
-                min-width: 14%; /* 64 units width */
-                background-color: dark-gray; /* Dark gray background */
-                color: white;
-                outline:2px solid orange;
+                padding: 1rem 3rem;
+                background-color: rgb(17 24 39);
             }
             
+            /* Full height and flexible layout for the nav */
+            .nav-flex-container {
+                display: flex;
+                flex-direction: column;
+                align-items:center;
+                border:0px solid orange;
+                width:100%;
+
+            }
+            
+
+            .sidebar {
+                
+                display: flex;
+                flex-direction: column;
+                color: white;
+                outline:0px solid orange;
+                width:100%;
+
+            }
+            .sidebar div {
+                background-color: rgb(17 24 39);
+                width:100%;
+
+                /* background-color: rgb(79 70 229); */
+                
+            }
+            .sidebar a {
+                padding:1rem 4rem 0.5rem 2rem !important;
+                font-size: 1.6rem;
+                line-height: 2.5rem;
+                outline:0px solid orange;
+                width:100%;
+            }
+            .sidebar a:hover {
+                background-color: rgb(55 65 81);
+                /* background-color:#312e8180; */
+            }
+            .sidebar a:active {
+                background-color:#312e8180;
+                font-size:2rem;
+            }
+            .outbdr {
+                border:0px solid red;
+                padding-top:1rem;
+            }
+            .nav-container {
+                display: flex;
+                border:0px solid blue;
+                flex: 0 0 15%;  
+            }
+            main {
+                outline: 0px solid red;
+                flex: 0 0 85%;
+            }
         </style>
     </head>
     <body class="font-sans antialiased">
-        <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
+    <livewire:layout.header />
+        <div class="flex min-h-screen min-w-screen outbdr bg-gray-100 dark:bg-gray-900">
             <livewire:layout.navigation />
-            <!-- Page Content -->
             <main>
                 {{ $slot }}
             </main>

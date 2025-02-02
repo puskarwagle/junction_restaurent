@@ -25,13 +25,13 @@ class NavigationUpdater
             return 0;
         }
 
-        $desktopRouteLink = "\n<div class=\"hidden space-x-8 sm:-my-px sm:ms-10 sm:flex\">\n"
+        $desktopRouteLink = "\n\n<div class=\"hidden sm:-my-px sm:flex\">\n"
             . "    <x-nav-link :href=\"route('$routeName')\" :active=\"request()->routeIs('$routeName')\" wire:navigate>\n"
             . "        {{ __('$routeLabel') }}\n"
             . "    </x-nav-link>\n"
             . "</div>\n";
 
-        $responsiveRouteLink = "\n<div class=\"pt-2 pb-3 space-y-1\">\n"
+        $responsiveRouteLink = "\n\n<div class=\"pt-2 pb-3 space-y-1\">\n"
             . "    <x-responsive-nav-link :href=\"route('$routeName')\" :active=\"request()->routeIs('$routeName')\" wire:navigate>\n"
             . "        {{ __('$routeLabel') }}\n"
             . "    </x-responsive-nav-link>\n"
