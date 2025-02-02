@@ -17,20 +17,61 @@ class SiteSettingsController extends Component
     public $key;
     public $value;
 
+    public $showCreateForm = false; // Tracks form visibility
+    public $selectedIds = []; // Stores selected IDs for deletion
+    public $nextId; // Stores the next ID for display
+
     public $search = '';
     public $sortField = 'id';
     public $sortDirection = 'asc';
     public $perPage = 10;
 
     protected $rules = [
-        'key' => '',
-        'value' => ''
+        'key' => 'required|string',
+        'value' => 'required|string',
     ];
 
     public function mount()
     {
         Log::info('mount function called');
-        // Any initialization can be added here if needed.
+        $this->calculateNextId();
+    }
+
+    public function calculateNextId()
+    {
+        $maxId = SiteSettings::max('id'); // Get the maximum ID from the database
+        $this->nextId = $maxId ? $maxId + 1 : 1; // Calculate the next ID
+    }
+
+    public function create()
+    {
+        $this->validate();
+
+        try {
+            SiteSettings::create([
+                'key' => $this->key,
+                'value' => $this->value,
+            ]);
+
+            session()->flash('message', 'Site setting created successfully.');
+            $this->reset(['key', 'value', 'showCreateForm']); // Reset form fields and hide the form
+            $this->calculateNextId(); // Recalculate the next ID
+        } catch (Exception $e) {
+            session()->flash('error', 'Failed to create site setting.');
+            Log::error('Error creating site setting: ' . $e->getMessage());
+        }
+    }
+
+    public function delete()
+    {
+        // Handle deletion of selected records
+        if (!empty($this->selectedIds)) {
+            SiteSettings::whereIn('id', $this->selectedIds)->delete();
+            session()->flash('message', 'Selected records deleted successfully.');
+            $this->selectedIds = []; // Clear selected IDs
+        } else {
+            session()->flash('error', 'No records selected.');
+        }
     }
 
     public function sortBy($field)
