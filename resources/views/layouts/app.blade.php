@@ -51,7 +51,18 @@
                 width:100%;
 
             }
-            
+            .blendInputs {
+    border: none !important; /* Remove borders */
+    background: transparent !important; /* Make background transparent */
+    outline: none !important; /* Remove focus outline */
+    width: 100%; /* Ensure inputs take full width of the cell */
+    padding: 0.5rem; /* Match table cell padding */
+    box-shadow: none !important; /* Remove any shadow */
+}
+
+.blendInputs:focus {
+    border: 1px solid #ddd !important; /* Optional: Add a subtle border on focus */
+}
 
             .sidebar {
                 
@@ -71,7 +82,7 @@
             }
             .sidebar a {
                 padding:1rem 4rem 0.5rem 2rem !important;
-                font-size: 1.6rem;
+                font-size: 1.2rem;
                 line-height: 2.5rem;
                 outline:0px solid orange;
                 width:100%;
