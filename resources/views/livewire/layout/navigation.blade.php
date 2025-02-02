@@ -23,40 +23,44 @@ $logout = function (Logout $logout) {
                 </div>
 
                 <div class="hidden sm:-my-px sm:flex">
-                    <x-nav-link :href="route('menuitems')" :active="request()->routeIs('menuitems')" wire:navigate>
-                        {{ __('Menu') }}
-                    </x-nav-link>
-                </div>
-
-                <div class="hidden sm:-my-px sm:flex">
                     <x-nav-link :href="route('users')" :active="request()->routeIs('users')" wire:navigate>
                         {{ __('Users') }}
                     </x-nav-link>
                 </div>
 
-                <div class="hidden sm:-my-px sm:flex">
-                    <x-nav-link :href="route('test_cruds')" :active="request()->routeIs('test_cruds')" wire:navigate>
-                        {{ __('TestCruds') }}
-                    </x-nav-link>
-                </div>
+<div class="hidden sm:-my-px sm:flex">
+    <x-nav-link :href="route('order_items')" :active="request()->routeIs('order_items')" wire:navigate>
+        {{ __('OrderItems') }}
+    </x-nav-link>
+</div>
 
-                <div class="hidden sm:-my-px sm:flex">
-                    <x-nav-link :href="route('site_settings')" :active="request()->routeIs('site_settings')" wire:navigate>
-                        {{ __('SiteSettings') }}
-                    </x-nav-link>
-                </div>
 
-                <div class="hidden sm:-my-px sm:flex">
-                    <x-nav-link :href="route('post_offices')" :active="request()->routeIs('post_offices')" wire:navigate>
-                        {{ __('PostOffices') }}
-                    </x-nav-link>
-                </div>
+<div class="hidden sm:-my-px sm:flex">
+    <x-nav-link :href="route('menu_items')" :active="request()->routeIs('menu_items')" wire:navigate>
+        {{ __('MenuItems') }}
+    </x-nav-link>
+</div>
 
-                <div class="hidden sm:-my-px sm:flex">
-                    <x-nav-link :href="route('order_items')" :active="request()->routeIs('order_items')" wire:navigate>
-                        {{ __('OrderItems') }}
-                    </x-nav-link>
-                </div>
+
+<div class="hidden sm:-my-px sm:flex">
+    <x-nav-link :href="route('post_offices')" :active="request()->routeIs('post_offices')" wire:navigate>
+        {{ __('PostOffices') }}
+    </x-nav-link>
+</div>
+
+
+<div class="hidden sm:-my-px sm:flex">
+    <x-nav-link :href="route('site_settings')" :active="request()->routeIs('site_settings')" wire:navigate>
+        {{ __('SiteSettings') }}
+    </x-nav-link>
+</div>
+
+
+
+
+
+            
+
 
 
             </div>
@@ -85,35 +89,35 @@ $logout = function (Logout $logout) {
             </x-responsive-nav-link>
         </div>
 
-        <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('menuitems')" :active="request()->routeIs('menuitems')" wire:navigate>
-                {{ __('Menu') }}
-            </x-responsive-nav-link>
-        </div>
+<div class="pt-2 pb-3 space-y-1">
+    <x-responsive-nav-link :href="route('order_items')" :active="request()->routeIs('order_items')" wire:navigate>
+        {{ __('OrderItems') }}
+    </x-responsive-nav-link>
+</div>
 
-        <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('test_cruds')" :active="request()->routeIs('test_cruds')" wire:navigate>
-                {{ __('TestCruds') }}
-            </x-responsive-nav-link>
-        </div>
 
-        <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('site_settings')" :active="request()->routeIs('site_settings')" wire:navigate>
-                {{ __('SiteSettings') }}
-            </x-responsive-nav-link>
-        </div>
+<div class="pt-2 pb-3 space-y-1">
+    <x-responsive-nav-link :href="route('menu_items')" :active="request()->routeIs('menu_items')" wire:navigate>
+        {{ __('MenuItems') }}
+    </x-responsive-nav-link>
+</div>
 
-        <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('post_offices')" :active="request()->routeIs('post_offices')" wire:navigate>
-                {{ __('PostOffices') }}
-            </x-responsive-nav-link>
-        </div>
-        
-        <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('order_items')" :active="request()->routeIs('order_items')" wire:navigate>
-                {{ __('OrderItems') }}
-            </x-responsive-nav-link>
-        </div>
+
+<div class="pt-2 pb-3 space-y-1">
+    <x-responsive-nav-link :href="route('post_offices')" :active="request()->routeIs('post_offices')" wire:navigate>
+        {{ __('PostOffices') }}
+    </x-responsive-nav-link>
+</div>
+
+
+<div class="pt-2 pb-3 space-y-1">
+    <x-responsive-nav-link :href="route('site_settings')" :active="request()->routeIs('site_settings')" wire:navigate>
+        {{ __('SiteSettings') }}
+    </x-responsive-nav-link>
+</div>
+
+
+
 
 
 

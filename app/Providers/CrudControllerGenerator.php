@@ -52,6 +52,14 @@ class $controllerClass extends Component
 
     $properties
 
+    public \$showCreateForm = false; // Tracks form visibility
+    public \$selectedIds = []; // Stores selected IDs for deletion
+    public \$nextId; // Stores the next ID for display
+
+    public \$editingField = null; // Tracks which field is being edited (e.g., 'key-1')
+    public \$editingValue = ''; // Stores the value being edited
+    public \$clickCount = []; // Tracks click counts for each field
+
     public \$search = '';
     public \$sortField = 'id';
     public \$sortDirection = 'asc';
@@ -64,6 +72,7 @@ class $controllerClass extends Component
     public function mount()
     {
         Log::info('mount function called');
+        \$this->calculateNextId();
         // Any initialization can be added here if needed.
     }
 
@@ -77,6 +86,68 @@ class $controllerClass extends Component
         }
     }
 
+    public function calculateNextId()
+    {
+        \$maxId = $model::max('id');
+        \$this->nextId = \$maxId ? \$maxId + 1 : 1;
+    }
+
+    public function create()
+    {
+        \$this->validate();
+
+        try {
+            $model::create([
+                {$this->generateCreateFields($fillables)}
+            ]);
+
+            session()->flash('message', '$model created successfully.');
+            \$this->reset([{$this->generateResetFields($fillables)}, 'showCreateForm']);
+            \$this->calculateNextId();
+        } catch (Exception \$e) {
+            session()->flash('error', 'Failed to create $model.');
+            Log::error('Error creating $model: ' . \$e->getMessage());
+        }
+    }
+
+    public function incrementClick(\$field, \$id, \$value)
+    {
+        \$key = \$field . '-' . \$id;
+
+        if (!isset(\$this->clickCount[\$key])) {
+            \$this->clickCount[\$key] = 0;
+        }
+
+        \$this->clickCount[\$key]++;
+
+        if (\$this->clickCount[\$key] === 4) {
+            \$this->editingField = \$key;
+            \$this->editingValue = \$value;
+            \$this->clickCount[\$key] = 0;
+        }
+    }
+
+    public function saveModifiedField(\$field, \$id)
+    {
+        \$record = $model::find(\$id);
+        \$record->\$field = \$this->editingValue;
+        \$record->save();
+
+        \$this->editingField = null;
+        \$this->editingValue = '';
+    }
+
+    public function delete()
+    {
+        if (!empty(\$this->selectedIds)) {
+            $model::whereIn('id', \$this->selectedIds)->delete();
+            session()->flash('message', 'Selected records deleted successfully.');
+            \$this->selectedIds = [];
+        } else {
+            session()->flash('error', 'No records selected.');
+        }
+    }
+        
     public function read()
     {
         // Dynamically retrieve fillable fields from the model
@@ -139,5 +210,14 @@ class $controllerClass extends Component
 EOD);
 
         Log::info("Controller generated for $model at $controllerFile");
+    }
+    private function generateCreateFields($fillables)
+    {
+        return implode(",\n                ", array_map(fn($f) => "'$f' => \$this->$f", $fillables));
+    }
+
+    private function generateResetFields($fillables)
+    {
+        return "'" . implode("', '", $fillables) . "'";
     }
 }

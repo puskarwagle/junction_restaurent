@@ -1,21 +1,26 @@
 <?php
 
-namespace App\Livewire\SiteSettings;
+namespace App\Livewire;
 
 use Livewire\Attributes\Layout;
-use App\Models\SiteSettings;
+use App\Models\MenuItem;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\WithFileUploads;
 use Exception;
 use Illuminate\Support\Facades\Log;
 
-class SiteSettingsController extends Component
+class MenuItemController extends Component
 {
     use WithFileUploads, WithPagination;
 
-    public $key;
-    public $value;
+    public $name;
+    public $price;
+    public $image_path;
+    public $description;
+    public $type;
+    public $discount;
+    public $is_special;
 
     public $showCreateForm = false; // Tracks form visibility
     public $selectedIds = []; // Stores selected IDs for deletion
@@ -31,84 +36,20 @@ class SiteSettingsController extends Component
     public $perPage = 10;
 
     protected $rules = [
-        'key' => 'required|string',
-        'value' => 'required|string',
+        'name' => '',
+        'price' => '',
+        'image_path' => '',
+        'description' => '',
+        'type' => '',
+        'discount' => '',
+        'is_special' => ''
     ];
 
     public function mount()
     {
         Log::info('mount function called');
         $this->calculateNextId();
-    }
-
-    public function calculateNextId()
-    {
-        $maxId = SiteSettings::max('id'); // Get the maximum ID from the database
-        $this->nextId = $maxId ? $maxId + 1 : 1; // Calculate the next ID
-    }
-
-    public function create()
-    {
-        $this->validate();
-
-        try {
-            SiteSettings::create([
-                'key' => $this->key,
-                'value' => $this->value,
-            ]);
-
-            session()->flash('message', 'Site setting created successfully.');
-            $this->reset(['key', 'value', 'showCreateForm']); // Reset form fields and hide the form
-            $this->calculateNextId(); // Recalculate the next ID
-        } catch (Exception $e) {
-            session()->flash('error', 'Failed to create site setting.');
-            Log::error('Error creating site setting: ' . $e->getMessage());
-        }
-    }
-
-    // Increment click count and toggle editing mode
-    public function incrementClick($field, $id, $value)
-    {
-        $key = $field . '-' . $id;
-
-        // Initialize click count if not set
-        if (!isset($this->clickCount[$key])) {
-            $this->clickCount[$key] = 0;
-        }
-
-        $this->clickCount[$key]++;
-
-        // If clicked 4 times, enable editing
-        if ($this->clickCount[$key] === 4) {
-            $this->editingField = $key;
-            $this->editingValue = $value;
-            $this->clickCount[$key] = 0; // Reset click count
-        }
-    }
-
-    // Save the edited field
-    public function saveModifiedField($field, $id)
-    {
-        // Find the record and update the field
-        $record = SiteSettings::find($id);
-        $record->$field = $this->editingValue;
-        $record->save();
-
-        // Reset editing state
-        $this->editingField = null;
-        $this->editingValue = '';
-    }
-
-    public function delete()
-    {
-        // Handle deletion of selected records
-        if (!empty($this->selectedIds)) {
-            SiteSettings::whereIn('id', $this->selectedIds)->delete();
-            session()->flash('message', 'Selected records deleted successfully.');
-            $this->selectedIds = []; // Clear selected IDs
-        } else {
-            session()->flash('error', 'No records selected.');
-        }
+        // Any initialization can be added here if needed.
     }
 
     public function sortBy($field)
@@ -121,14 +62,82 @@ class SiteSettingsController extends Component
         }
     }
 
+    public function calculateNextId()
+    {
+        $maxId = MenuItem::max('id');
+        $this->nextId = $maxId ? $maxId + 1 : 1;
+    }
+
+    public function create()
+    {
+        $this->validate();
+
+        try {
+            MenuItem::create([
+                'name' => $this->name,
+                'price' => $this->price,
+                'image_path' => $this->image_path,
+                'description' => $this->description,
+                'type' => $this->type,
+                'discount' => $this->discount,
+                'is_special' => $this->is_special
+            ]);
+
+            session()->flash('message', 'MenuItem created successfully.');
+            $this->reset(['name', 'price', 'image_path', 'description', 'type', 'discount', 'is_special', 'showCreateForm']);
+            $this->calculateNextId();
+        } catch (Exception $e) {
+            session()->flash('error', 'Failed to create MenuItem.');
+            Log::error('Error creating MenuItem: ' . $e->getMessage());
+        }
+    }
+
+    public function incrementClick($field, $id, $value)
+    {
+        $key = $field . '-' . $id;
+
+        if (!isset($this->clickCount[$key])) {
+            $this->clickCount[$key] = 0;
+        }
+
+        $this->clickCount[$key]++;
+
+        if ($this->clickCount[$key] === 4) {
+            $this->editingField = $key;
+            $this->editingValue = $value;
+            $this->clickCount[$key] = 0;
+        }
+    }
+
+    public function saveModifiedField($field, $id)
+    {
+        $record = MenuItem::find($id);
+        $record->$field = $this->editingValue;
+        $record->save();
+
+        $this->editingField = null;
+        $this->editingValue = '';
+    }
+
+    public function delete()
+    {
+        if (!empty($this->selectedIds)) {
+            MenuItem::whereIn('id', $this->selectedIds)->delete();
+            session()->flash('message', 'Selected records deleted successfully.');
+            $this->selectedIds = [];
+        } else {
+            session()->flash('error', 'No records selected.');
+        }
+    }
+        
     public function read()
     {
         // Dynamically retrieve fillable fields from the model
-        $modelInstance = new SiteSettings;
+        $modelInstance = new MenuItem;
         $fillable = $modelInstance->getFillable();
 
         // Build the query
-        $query = SiteSettings::query();
+        $query = MenuItem::query();
 
         // Apply filtering if a search term is provided
         if (!empty($this->search)) {
@@ -172,7 +181,7 @@ class SiteSettingsController extends Component
     {
         Log::info('render function called');
         $data = $this->read();
-        return view('SiteSettings-cruds', [
+        return view('MenuItem-cruds', [
             'tabledata' => $data['tabledata'],
             'pagination' => $data['pagination'],
             'sort' => $data['sort'],

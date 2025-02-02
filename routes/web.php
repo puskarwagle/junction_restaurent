@@ -1,4 +1,13 @@
 <?php
+use App\Livewire\OrderItemController;
+
+use App\Livewire\MenuItemController;
+
+use App\Livewire\PostOfficeController;
+
+use App\Livewire\SiteSettingsController;
+
+
 
 use Illuminate\Support\Facades\Route;
 
@@ -27,14 +36,9 @@ Route::get('/fromOurMenu', FromOurMenu::class);
 
 
 //Backend uses
-use App\Livewire\Backend\MenuManagement;
 use App\Livewire\Backend\AdminManagement;
-use App\Livewire\TestCrud\TestCrudController;
-use App\Livewire\SiteSettings\SiteSettingsController;
 
-use App\Livewire\PostOfficeController;
-
-use App\Livewire\OrderItemController;Route::view(uri: 'dashboard', view: 'dashboard')
+Route::view(uri: 'dashboard', view: 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
@@ -42,35 +46,24 @@ Route::view('profile', 'profile')
     ->middleware(['auth'])
     ->name('profile');
 
-Route::get('menuitems', MenuManagement::class)
-    ->middleware(['auth'])
-    ->name('menuitems');
-
-// Route::get('users', AdminManagement::class)
-//     ->middleware(['auth'])
-//     ->name('users');
-
 Route::get('users', AdminManagement::class)
     ->middleware(['auth'])
     ->name('users');
-        
-Route::get('test_cruds', TestCrudController::class)
-    ->middleware(['auth'])
-    ->name('test_cruds');
         
 Route::get('site_settings', SiteSettingsController::class)
     ->middleware(['auth'])
     ->name('site_settings');
         
-        
 Route::get('post_offices', PostOfficeController::class)
     ->middleware(['auth'])
     ->name('post_offices');
         
+Route::get('menu_items', MenuItemController::class)
+    ->middleware(['auth'])
+    ->name('menu_items');
         
 Route::get('order_items', OrderItemController::class)
     ->middleware(['auth'])
     ->name('order_items');
-
 
 require __DIR__.'/auth.php';

@@ -3,21 +3,19 @@
 namespace App\Livewire;
 
 use Livewire\Attributes\Layout;
-use App\Models\OrderItem;
+use App\Models\SiteSettings;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\WithFileUploads;
 use Exception;
 use Illuminate\Support\Facades\Log;
 
-class OrderItemController extends Component
+class SiteSettingsController extends Component
 {
     use WithFileUploads, WithPagination;
 
-    public $order_id;
-    public $menu_item_name;
-    public $quantity;
-    public $price;
+    public $key;
+    public $value;
 
     public $showCreateForm = false; // Tracks form visibility
     public $selectedIds = []; // Stores selected IDs for deletion
@@ -33,10 +31,8 @@ class OrderItemController extends Component
     public $perPage = 10;
 
     protected $rules = [
-        'order_id' => '',
-        'menu_item_name' => '',
-        'quantity' => '',
-        'price' => ''
+        'key' => '',
+        'value' => ''
     ];
 
     public function mount()
@@ -58,7 +54,7 @@ class OrderItemController extends Component
 
     public function calculateNextId()
     {
-        $maxId = OrderItem::max('id');
+        $maxId = SiteSettings::max('id');
         $this->nextId = $maxId ? $maxId + 1 : 1;
     }
 
@@ -67,19 +63,17 @@ class OrderItemController extends Component
         $this->validate();
 
         try {
-            OrderItem::create([
-                'order_id' => $this->order_id,
-                'menu_item_name' => $this->menu_item_name,
-                'quantity' => $this->quantity,
-                'price' => $this->price
+            SiteSettings::create([
+                'key' => $this->key,
+                'value' => $this->value
             ]);
 
-            session()->flash('message', 'OrderItem created successfully.');
-            $this->reset(['order_id', 'menu_item_name', 'quantity', 'price', 'showCreateForm']);
+            session()->flash('message', 'SiteSettings created successfully.');
+            $this->reset(['key', 'value', 'showCreateForm']);
             $this->calculateNextId();
         } catch (Exception $e) {
-            session()->flash('error', 'Failed to create OrderItem.');
-            Log::error('Error creating OrderItem: ' . $e->getMessage());
+            session()->flash('error', 'Failed to create SiteSettings.');
+            Log::error('Error creating SiteSettings: ' . $e->getMessage());
         }
     }
 
@@ -102,7 +96,7 @@ class OrderItemController extends Component
 
     public function saveModifiedField($field, $id)
     {
-        $record = OrderItem::find($id);
+        $record = SiteSettings::find($id);
         $record->$field = $this->editingValue;
         $record->save();
 
@@ -113,7 +107,7 @@ class OrderItemController extends Component
     public function delete()
     {
         if (!empty($this->selectedIds)) {
-            OrderItem::whereIn('id', $this->selectedIds)->delete();
+            SiteSettings::whereIn('id', $this->selectedIds)->delete();
             session()->flash('message', 'Selected records deleted successfully.');
             $this->selectedIds = [];
         } else {
@@ -124,11 +118,11 @@ class OrderItemController extends Component
     public function read()
     {
         // Dynamically retrieve fillable fields from the model
-        $modelInstance = new OrderItem;
+        $modelInstance = new SiteSettings;
         $fillable = $modelInstance->getFillable();
 
         // Build the query
-        $query = OrderItem::query();
+        $query = SiteSettings::query();
 
         // Apply filtering if a search term is provided
         if (!empty($this->search)) {
@@ -172,7 +166,7 @@ class OrderItemController extends Component
     {
         Log::info('render function called');
         $data = $this->read();
-        return view('OrderItem-cruds', [
+        return view('SiteSettings-cruds', [
             'tabledata' => $data['tabledata'],
             'pagination' => $data['pagination'],
             'sort' => $data['sort'],

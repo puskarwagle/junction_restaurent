@@ -8,8 +8,8 @@
 
     <!-- Create and Delete Buttons -->
     <div class="mb-3">
-        <button wire:click="$toggle('showCreateForm')" class="btn btn-sm {{ $showCreateForm ? 'btn-warning' : 'btn-primary' }}">
-            {{ $showCreateForm ? 'Cancel' : 'Create New' }}
+        <button wire:click="$toggle('showCreateForm')" class="btn btn-sm {{$showCreateForm ? 'btn-warning' : 'btn-primary' }}">
+            {{$showCreateForm ? 'Cancel' : 'Create New' }}
         </button>
         <button wire:click="delete" class="btn btn-danger btn-sm">Delete</button>
         @if ($showCreateForm)
@@ -41,9 +41,7 @@
                     @foreach ($tabledata[0] ?? [] as $field => $value)
                         @if (!in_array($field, ['id', 'created_at', 'updated_at'])) <!-- Exclude these fields -->
                             <td>
-                                @if ($field === 'key' || $field === 'value')
-                                    <input type="text" wire:model="{{ $field }}" class="form-control blendInputs" placeholder="Enter {{ ucfirst($field) }}">
-                                @endif
+                                <input type="text" wire:model="{{ $field }}" class="form-control blendInputs" placeholder="Enter {{ ucfirst($field) }}">
                             </td>
                         @endif
                     @endforeach

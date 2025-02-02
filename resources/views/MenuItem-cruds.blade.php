@@ -1,5 +1,5 @@
 <div class="container mt-4">
-    <h1 class="mb-4">OrderItem Management</h1>
+    <h1 class="mb-4">MenuItem Management</h1>
     
     <!-- Search Input -->
     <div class="mb-3">

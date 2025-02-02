@@ -33,7 +33,6 @@ class RouteUpdater
         // New route to add
         $newRoute = <<<EOD
         
-        
 Route::get('$routeUri', $controllerClassName::class)
     ->middleware(['auth'])
     ->name('$routeName');
@@ -51,140 +50,81 @@ EOD;
             return 0;
         }
 
-        // If only the route exists, but the use statement doesn't, add the use statement
-        if ($routeExists && !$useStatementExists) {
-            $useStatement = "use $controllerClass;";
-            $lastUsePos = strrpos($content, 'use App\Livewire');
-
-            if ($lastUsePos === false) {
-                // If no use statement for Livewire exists, add it at the top
-                $content = "<?php\n$useStatement\n\n" . ltrim($content, "<?php\n");
-            } else {
-                // Find the end of the last use statement line
-                $lastUseEndPos = strpos($content, "\n", $lastUsePos);
-
-                // Insert the new use statement after the last use statement
-                $content = substr_replace(
-                    $content,
-                    "\n" . $useStatement,
-                    $lastUseEndPos + 1,
-                    0
-                );
-            }
-
-            // Write the updated content back to the file
-            File::put($webFilePath, $content);
-
+        // Add the use statement if it doesn't exist
+        if (!$useStatementExists) {
+            $content = $this->insertUseStatement($content, $controllerClass);
             Log::info("Use statement for $controllerClass added to web.php.");
-            return 1;
         }
 
-        // If only the use statement exists, but the route doesn't, add the route
-        if ($useStatementExists && !$routeExists) {
-            // Find the last occurrence of "Route::get" that is not commented out
-            $lastRouteGetPos = $this->findLastRouteGet($content);
-
-            if ($lastRouteGetPos === false) {
-                throw new Exception("No valid Route::get found in web.php.");
-            }
-
-            // Find the end of the last Route::get (look for the semicolon)
-            $lastRouteGetEndPos = strpos($content, ';', $lastRouteGetPos);
-
-            if ($lastRouteGetEndPos === false) {
-                throw new Exception("Invalid Route::get syntax in web.php.");
-            }
-
-            // Insert the new route after the last Route::get
-            $content = substr_replace(
-                $content,
-                "\n" . $newRoute,
-                $lastRouteGetEndPos + 1,
-                0
-            );
-
-            // Write the updated content back to the file
-            File::put($webFilePath, $content);
-
+        // Add the route if it doesn't exist
+        if (!$routeExists) {
+            $content = $this->insertRoute($content, $newRoute);
             Log::info("Route for $routeName added to web.php.");
-            return 1;
         }
 
-        // If neither the route nor the use statement exists, add both
-        if (!$routeExists && !$useStatementExists) {
-            // Add the use statement
-            $useStatement = "use $controllerClass;";
-            $lastUsePos = strrpos($content, 'use App\Livewire');
+        // Write the updated content back to the file
+        File::put($webFilePath, $content);
 
-            if ($lastUsePos === false) {
-                // If no use statement for Livewire exists, add it at the top
-                $content = "<?php\n$useStatement\n\n" . ltrim($content, "<?php\n");
-            } else {
-                // Find the end of the last use statement line
-                $lastUseEndPos = strpos($content, "\n", $lastUsePos);
-
-                // Insert the new use statement after the last use statement
-                $content = substr_replace(
-                    $content,
-                    "\n" . $useStatement,
-                    $lastUseEndPos + 1,
-                    0
-                );
-            }
-
-            // Add the route
-            $lastRouteGetPos = $this->findLastRouteGet($content);
-
-            if ($lastRouteGetPos === false) {
-                throw new Exception("No valid Route::get found in web.php.");
-            }
-
-            $lastRouteGetEndPos = strpos($content, ';', $lastRouteGetPos);
-
-            if ($lastRouteGetEndPos === false) {
-                throw new Exception("Invalid Route::get syntax in web.php.");
-            }
-
-            $content = substr_replace(
-                $content,
-                "\n" . $newRoute,
-                $lastRouteGetEndPos + 1,
-                0
-            );
-
-            // Write the updated content back to the file
-            File::put($webFilePath, $content);
-
-            Log::info("Route and use statement for $routeName added to web.php.");
-            return 1;
-        }
-
-        return 0;
+        return 1;
     }
 
     /**
-     * Find the last occurrence of "Route::get" that is not commented out.
+     * Insert a use statement into the content.
      *
      * @param string $content
-     * @return int|false
+     * @param string $controllerClass
+     * @return string
      */
-    protected function findLastRouteGet($content)
+    protected function insertUseStatement($content, $controllerClass)
     {
-        $lastRouteGetPos = false;
-        $pos = 0;
+        $useStatement = "use $controllerClass;";
 
-        while (($pos = strpos($content, 'Route::get', $pos)) !== false) {
-            // Check if the line is commented out
-            $lineStart = strrpos(substr($content, 0, $pos), "\n") + 1;
-            $line = substr($content, $lineStart, $pos - $lineStart);
-
-            if (!Str::startsWith(trim($line), '//')) {
-                $lastRouteGetPos = $pos;
+        // Insert the use statement after the opening PHP tag or the last use statement
+        if (strpos($content, '<?php') === 0) {
+            $content = substr_replace($content, "<?php\n$useStatement\n", 0, 5);
+        } else {
+            $lastUsePos = strrpos($content, 'use ');
+            if ($lastUsePos !== false) {
+                $lastUseEndPos = strpos($content, "\n", $lastUsePos);
+                $content = substr_replace($content, "\n$useStatement", $lastUseEndPos, 0);
+            } else {
+                $content = "<?php\n$useStatement\n\n" . ltrim($content, "<?php\n");
             }
-
-            $pos += strlen('Route::get');
         }
 
-        return $lastRouteGetPos;
+        return $content;
+    }
+
+    /**
+     * Insert a route into the content.
+     *
+     * @param string $content
+     * @param string $newRoute
+     * @return string
+     */
+    protected function insertRoute($content, $newRoute)
+    {
+        // Find the last occurrence of "Route::"
+        $lastRoutePos = strrpos($content, 'Route::');
+
+        if ($lastRoutePos === false) {
+            // If no routes exist, append the new route at the end
+            return $content . "\n" . $newRoute;
+        }
+
+        // Find the end of the last route (semicolon)
+        $lastRouteEndPos = strpos($content, ';', $lastRoutePos);
+
+        if ($lastRouteEndPos === false) {
+            throw new Exception("Invalid route syntax in web.php.");
+        }
+
+        // Insert the new route after the last route
+        return substr_replace(
+            $content,
+            "\n" . $newRoute,
+            $lastRouteEndPos + 1,
+            0
+        );
     }
 }

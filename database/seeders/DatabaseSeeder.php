@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             SiteSettingsSeeder::class,
             MenuItemsSeeder::class,
+            SiteSettingsSeeder::class,
         ]);
         User::factory()->create([
             'name' => 'Test User',
