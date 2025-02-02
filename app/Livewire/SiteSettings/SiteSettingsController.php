@@ -21,6 +21,10 @@ class SiteSettingsController extends Component
     public $selectedIds = []; // Stores selected IDs for deletion
     public $nextId; // Stores the next ID for display
 
+    public $editingField = null; // Tracks which field is being edited (e.g., 'key-1')
+    public $editingValue = ''; // Stores the value being edited
+    public $clickCount = []; // Tracks click counts for each field
+
     public $search = '';
     public $sortField = 'id';
     public $sortDirection = 'asc';
@@ -60,6 +64,39 @@ class SiteSettingsController extends Component
             session()->flash('error', 'Failed to create site setting.');
             Log::error('Error creating site setting: ' . $e->getMessage());
         }
+    }
+
+    // Increment click count and toggle editing mode
+    public function incrementClick($field, $id, $value)
+    {
+        $key = $field . '-' . $id;
+
+        // Initialize click count if not set
+        if (!isset($this->clickCount[$key])) {
+            $this->clickCount[$key] = 0;
+        }
+
+        $this->clickCount[$key]++;
+
+        // If clicked 4 times, enable editing
+        if ($this->clickCount[$key] === 4) {
+            $this->editingField = $key;
+            $this->editingValue = $value;
+            $this->clickCount[$key] = 0; // Reset click count
+        }
+    }
+
+    // Save the edited field
+    public function saveModifiedField($field, $id)
+    {
+        // Find the record and update the field
+        $record = SiteSettings::find($id);
+        $record->$field = $this->editingValue;
+        $record->save();
+
+        // Reset editing state
+        $this->editingField = null;
+        $this->editingValue = '';
     }
 
     public function delete()

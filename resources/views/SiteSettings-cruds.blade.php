@@ -61,7 +61,13 @@
                     <td>{{ $record['id'] }}</td>
                     @foreach ($record as $field => $value)
                         @if (!in_array($field, ['id', 'created_at', 'updated_at'])) <!-- Exclude these fields -->
-                            <td>{{ $value }}</td>
+                            <td>
+                                @if ($editingField === $field . '-' . $record['id'])
+                                    <input type="text" wire:model="editingValue" class="form-control" wire:keydown.enter="saveModifiedField('{{ $field }}', {{ $record['id'] }})">
+                                @else
+                                    <span wire:click="incrementClick('{{ $field }}', {{ $record['id'] }}, '{{ $value }}')">{{ $value }}</span>
+                                @endif
+                            </td>
                         @endif
                     @endforeach
                     <td>{{ $record['created_at'] }}</td> <!-- Display created_at -->

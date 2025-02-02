@@ -55,6 +55,9 @@
     border: none !important; /* Remove borders */
     background: transparent !important; /* Make background transparent */
     outline: none !important; /* Remove focus outline */
+    border: 1px solid #ccc;
+    padding: 5px;
+    border-radius: 4px;
     width: 100%; /* Ensure inputs take full width of the cell */
     padding: 0.5rem; /* Match table cell padding */
     box-shadow: none !important; /* Remove any shadow */
