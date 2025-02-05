@@ -8,29 +8,23 @@ use Illuminate\Support\Facades\Log;
 
 class CrudControllerGenerator
 {
-    public function generate($model, $controllerPath)
+    public function generate(string $model, string $controllerPath): void
     {
         $controllerClass = $model . 'Controller';
         $controllerFile = "$controllerPath/$controllerClass.php";
 
-        $namespaceForThisFile = str_replace('/', '\\', ucfirst($controllerPath));
+        $namespaceForThisFile = implode('\\', array_map(fn($part) => Str::studly($part), explode('/', $controllerPath)));
         $modelImportPath = "App\\Models\\$model";
 
-        // Ensure the model exists
         if (!class_exists($modelImportPath)) {
             throw new Exception("Model $modelImportPath not found.");
         }
 
-        // Get fillable attributes from the model
         $fillables = (new $modelImportPath)->getFillable();
-        $properties = implode("\n    ", array_map(fn($f) => "public \$$f;", $fillables));
+        $rulesString = implode(",\n        ", array_map(fn($f) => "'$f' => 'required'", $fillables));
 
-        // Generate the rules string with empty rules for the user to fill in
-        $rulesString = implode(",\n        ", array_map(fn($f) => "'$f' => ''", $fillables));
-
-        // Generate the view name dynamically
-        $viewName = $model; 
-        $layoutName = 'layouts.app'; // Default layout, can be customized if needed
+        $viewName = $model;
+        $layoutName = 'layouts.app';
 
         File::ensureDirectoryExists($controllerPath);
         File::put($controllerFile, <<<EOD
@@ -45,38 +39,34 @@ use Livewire\\WithPagination;
 use Livewire\\WithFileUploads;
 use Exception;
 use Illuminate\\Support\\Facades\\Log;
+use Illuminate\\View\\View;
 
 class $controllerClass extends Component
 {
     use WithFileUploads, WithPagination;
 
-    $properties
+    public bool \$showCreateForm = false;
+    public array \$selectedIds = [];
+    public bool \$selectAll = false;
+    public int \$nextId;
+    public ?string \$editingField = null;
+    public string \$editingValue = '';
+    public array \$clickCount = [];
+    public string \$search = '';
+    public string \$sortField = 'id';
+    public string \$sortDirection = 'asc';
+    public int \$perPage = 10;
 
-    public \$showCreateForm = false; // Tracks form visibility
-    public \$selectedIds = []; // Stores selected IDs for deletion
-    public \$nextId; // Stores the next ID for display
-
-    public \$editingField = null; // Tracks which field is being edited (e.g., 'key-1')
-    public \$editingValue = ''; // Stores the value being edited
-    public \$clickCount = []; // Tracks click counts for each field
-
-    public \$search = '';
-    public \$sortField = 'id';
-    public \$sortDirection = 'asc';
-    public \$perPage = 10;
-
-    protected \$rules = [
+    protected array \$rules = [
         $rulesString
     ];
 
-    public function mount()
+    public function mount(): void
     {
-        Log::info('mount function called');
         \$this->calculateNextId();
-        // Any initialization can be added here if needed.
     }
 
-    public function sortBy(\$field)
+    public function sortBy(string \$field): void
     {
         if (\$this->sortField === \$field) {
             \$this->sortDirection = \$this->sortDirection === 'asc' ? 'desc' : 'asc';
@@ -86,50 +76,57 @@ class $controllerClass extends Component
         }
     }
 
-    public function calculateNextId()
+    public function calculateNextId(): void
     {
         \$maxId = $model::max('id');
         \$this->nextId = \$maxId ? \$maxId + 1 : 1;
     }
 
-    public function create()
+    public function create(): void
     {
         \$this->validate();
 
         try {
-            $model::create([
-                {$this->generateCreateFields($fillables)}
-            ]);
-
+            $model::create(\$this->only(...\$this->fillableAttributes()));
             session()->flash('message', '$model created successfully.');
-            \$this->reset([{$this->generateResetFields($fillables)}, 'showCreateForm']);
+            \$this->reset([...\$this->fillableAttributes(), 'showCreateForm']);
             \$this->calculateNextId();
         } catch (Exception \$e) {
-            session()->flash('error', 'Failed to create $model.');
-            Log::error('Error creating $model: ' . \$e->getMessage());
+            session()->flash('error', 'Failed to create ' . $model . ': ' . \$e->getMessage());
+            Log::error('Error creating ' . $model . ': ' . \$e->getMessage());
         }
     }
 
-    public function incrementClick(\$field, \$id, \$value)
+    public function incrementClick(string \$field, int \$id, mixed \$value): void
     {
-        \$key = \$field . '-' . \$id;
-
-        if (!isset(\$this->clickCount[\$key])) {
-            \$this->clickCount[\$key] = 0;
-        }
-
-        \$this->clickCount[\$key]++;
+        \$key = "\$field-\$id";
+        \$this->clickCount[\$key] = (\$this->clickCount[\$key] ?? 0) + 1;
 
         if (\$this->clickCount[\$key] === 4) {
             \$this->editingField = \$key;
-            \$this->editingValue = \$value;
+            \$this->editingValue = (string) \$value;
             \$this->clickCount[\$key] = 0;
         }
     }
 
-    public function saveModifiedField(\$field, \$id)
+    public function saveModifiedField(string \$field, int \$id): void
     {
         \$record = $model::find(\$id);
+
+        if (!\$record) {
+            session()->flash('error', 'Record not found.');
+            return;
+        }
+
+        if (!in_array(\$field, \$record->getFillable(), true)) {
+            session()->flash('error', 'Field cannot be edited.');
+            return;
+        }
+
+        \$this->validate([
+            \$field => \$this->rules[\$field] ?? 'required',
+        ]);
+
         \$record->\$field = \$this->editingValue;
         \$record->save();
 
@@ -137,7 +134,7 @@ class $controllerClass extends Component
         \$this->editingValue = '';
     }
 
-    public function delete()
+    public function delete(): void
     {
         if (!empty(\$this->selectedIds)) {
             $model::whereIn('id', \$this->selectedIds)->delete();
@@ -148,16 +145,13 @@ class $controllerClass extends Component
         }
     }
         
-    public function read()
+    public function read(): array
     {
-        // Dynamically retrieve fillable fields from the model
         \$modelInstance = new $model;
         \$fillable = \$modelInstance->getFillable();
 
-        // Build the query
         \$query = $model::query();
 
-        // Apply filtering if a search term is provided
         if (!empty(\$this->search)) {
             \$query->where(function(\$q) use (\$fillable) {
                 foreach (\$fillable as \$field) {
@@ -166,19 +160,12 @@ class $controllerClass extends Component
             });
         }
 
-        // Apply sorting
         \$query->orderBy(\$this->sortField, \$this->sortDirection);
-
-        // Return paginated results as an array
         \$paginatedResults = \$query->paginate(\$this->perPage);
 
-        // Dynamically get the columns and their data
-        \$tabledata = \$paginatedResults->map(function (\$item) {
-            return \$item->toArray(); // Convert each item to an array
-        });
-
         return [
-            'tabledata' => \$tabledata, 
+            'tabledata' => \$paginatedResults->items(),
+            'fields' => \$fillable,
             'pagination' => [
                 'current_page' => \$paginatedResults->currentPage(),
                 'per_page' => \$paginatedResults->perPage(),
@@ -194,30 +181,34 @@ class $controllerClass extends Component
             ],
         ];
     }
-
-    public function render()
+    
+    public function goToPage(int \$page): void
     {
-        Log::info('render function called');
-        \$data = \$this->read();
-        return view('$viewName-cruds', [
-            'tabledata' => \$data['tabledata'],
-            'pagination' => \$data['pagination'],
-            'sort' => \$data['sort'],
-            'search' => \$data['search'],
-        ])->layout('$layoutName');
+        \$this->gotoPage(\$page);
+    }
+
+    public function previousPage(): void
+    {
+        \$this->previousPage();
+    }
+
+    public function nextPage(): void
+    {
+        \$this->nextPage();
+    }
+
+    public function render(): View
+    {
+        return view('$viewName-cruds', \$this->read())->layout('$layoutName');
+    }
+
+    private function fillableAttributes(): array
+    {
+        return (new $model)->getFillable();
     }
 }
 EOD);
 
         Log::info("Controller generated for $model at $controllerFile");
-    }
-    private function generateCreateFields($fillables)
-    {
-        return implode(",\n                ", array_map(fn($f) => "'$f' => \$this->$f", $fillables));
-    }
-
-    private function generateResetFields($fillables)
-    {
-        return "'" . implode("', '", $fillables) . "'";
     }
 }

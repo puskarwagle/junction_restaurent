@@ -29,6 +29,13 @@ $logout = function (Logout $logout) {
                 </div>
 
 <div class="hidden sm:-my-px sm:flex">
+    <x-nav-link :href="route('coupon_codes')" :active="request()->routeIs('coupon_codes')" wire:navigate>
+        {{ __('CouponCodes') }}
+    </x-nav-link>
+</div>
+
+
+<div class="hidden sm:-my-px sm:flex">
     <x-nav-link :href="route('order_items')" :active="request()->routeIs('order_items')" wire:navigate>
         {{ __('OrderItems') }}
     </x-nav-link>
@@ -88,6 +95,13 @@ $logout = function (Logout $logout) {
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
         </div>
+
+<div class="pt-2 pb-3 space-y-1">
+    <x-responsive-nav-link :href="route('coupon_codes')" :active="request()->routeIs('coupon_codes')" wire:navigate>
+        {{ __('CouponCodes') }}
+    </x-responsive-nav-link>
+</div>
+
 
 <div class="pt-2 pb-3 space-y-1">
     <x-responsive-nav-link :href="route('order_items')" :active="request()->routeIs('order_items')" wire:navigate>

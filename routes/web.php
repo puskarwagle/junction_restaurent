@@ -1,13 +1,4 @@
 <?php
-use App\Livewire\OrderItemController;
-
-use App\Livewire\MenuItemController;
-
-use App\Livewire\PostOfficeController;
-
-use App\Livewire\SiteSettingsController;
-
-
 
 use Illuminate\Support\Facades\Route;
 
@@ -21,9 +12,7 @@ use App\Livewire\Frontend\Cart;
 use App\Livewire\Frontend\FromOurMenu;
 
 // Frontend Routes
-Route::get('/', function () {
-    return view('livewire.pages.front.home');
-});
+Route::get('/', function () {return view('livewire.pages.front.home');});
 Route::get('/about', About::class);
 Route::get('/contact', Contact::class);
 Route::get('/menu', Menu::class);
@@ -31,12 +20,13 @@ Route::get('/bookaTable', BookaTable::class);
 Route::get('/cart', Cart::class);
 Route::get('/fromOurMenu', FromOurMenu::class);
 
-
-
-
-
 //Backend uses
-use App\Livewire\Backend\AdminManagement;
+use App\Livewire\UserController;
+use App\Livewire\CouponCodeController;
+use App\Livewire\OrderItemController;
+use App\Livewire\MenuItemController;
+use App\Livewire\PostOfficeController;
+use App\Livewire\SiteSettingsController;
 
 Route::view(uri: 'dashboard', view: 'dashboard')
     ->middleware(['auth', 'verified'])
@@ -46,7 +36,7 @@ Route::view('profile', 'profile')
     ->middleware(['auth'])
     ->name('profile');
 
-Route::get('users', AdminManagement::class)
+Route::get('users', UserController::class)
     ->middleware(['auth'])
     ->name('users');
         
@@ -65,5 +55,9 @@ Route::get('menu_items', MenuItemController::class)
 Route::get('order_items', OrderItemController::class)
     ->middleware(['auth'])
     ->name('order_items');
+        
+Route::get('coupon_codes', CouponCodeController::class)
+    ->middleware(['auth'])
+    ->name('coupon_codes');
 
 require __DIR__.'/auth.php';

@@ -1,0 +1,92 @@
+<div class="container mt-4">
+    <h1 class="mb-4">CouponCode Management</h1>
+    
+    <!-- Search Input -->
+    <div class="mb-3">
+        <input type="text" wire:model.live="search" placeholder="Search..." class="form-control blendinputs">
+    </div>
+
+    <!-- Create and Delete Buttons -->
+    <div class="mb-3">
+        <button wire:click="$toggle('showCreateForm')" class="btn btn-sm {{$showCreateForm ? 'btn-warning' : 'btn-primary' }}">
+            {{$showCreateForm ? 'Cancel' : 'Create New' }}
+        </button>
+        <button wire:click="delete" class="btn btn-danger btn-sm">Delete</button>
+        @if ($showCreateForm)
+        <button wire:click="create" class="btn btn-success btn-sm">Save</button>
+        @endif
+    </div>
+    
+    <!-- Table -->
+    <table class="table table-striped table-bordered">
+    <thead class="table-dark">
+        <tr>
+            <th><input type="checkbox" wire:model="selectAll" aria-label="Select all rows"></th>
+            <th wire:click="sortBy('id')">ID</th>
+            @foreach ($fields as $field)
+                @if (!in_array($field, ['id', 'created_at', 'updated_at']))
+                    <th wire:click="sortBy('{{ $field }}')">{{ ucfirst($field) }}</th>
+                @endif
+            @endforeach
+            <th>Created At</th>
+            <th>Updated At</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if ($showCreateForm)
+            <tr>
+                <td></td>
+                <td>{{ $nextId }}</td>
+                @foreach ($fields as $field)
+                    @if (!in_array($field, ['id', 'created_at', 'updated_at']))
+                        <td>
+                            <input type="text" wire:model.defer="newRecord.{{ $field }}" class="form-control blendinputs" placeholder="Enter {{ ucfirst($field) }}">
+                        </td>
+                    @endif
+                @endforeach
+                <td></td>
+                <td></td>
+            </tr>
+        @endif
+
+        @forelse ($tabledata as $record)
+            <tr>
+                <td><input type="checkbox" wire:model="selectedIds" value="{{ $record['id'] }}"></td>
+                <td>{{ $record['id'] }}</td>
+                @foreach ($fields as $field)
+                    @if (!in_array($field, ['id', 'created_at', 'updated_at']))
+                        <td>
+                            @if ($editingField === $field . '-' . $record['id'])
+                                <input type="text" wire:model="editingValue" class="form-control" wire:keydown.enter="saveModifiedField('{{ $field }}', {{ $record['id'] }})">
+                            @else
+                                <span wire:click="incrementClick('{{ $field }}', {{ $record['id'] }}, '{{ $record[$field] ?? '' }}')">
+                                    {{ $record[$field] ?? '' }}
+                                </span>
+                            @endif
+                        </td>
+                    @endif
+                @endforeach
+                <td>{{ $record['created_at'] }}</td>
+                <td>{{ $record['updated_at'] }}</td>
+            </tr>
+        @empty
+            <tr>
+                <td colspan="{{ count($fields) + 3 }}" class="text-center">No data available.</td>
+            </tr>
+        @endforelse
+    </tbody>
+</table>
+
+    
+    <!-- Pagination Controls -->
+    <div class="d-flex justify-content-between align-items-center mt-3">
+        <select wire:model.live="perPage" class="form-select w-auto">
+            <option value="10">10 per page</option>
+            <option value="25">25 per page</option>
+            <option value="50">50 per page</option>
+            <option value="100">100 per page</option>
+        </select>
+        <span>Page {{ $pagination['current_page'] }} of {{ $pagination['last_page'] }}</span>
+        <span>{{ $pagination['total'] }} Total Records</span>
+    </div>
+</div>

@@ -51,21 +51,22 @@
                 width:100%;
 
             }
-            .blendInputs {
+            .blendInputs[type=text] {
     border: none !important; /* Remove borders */
-    background: transparent !important; /* Make background transparent */
+    background: transparent !important; /* Transparent background */
     outline: none !important; /* Remove focus outline */
-    border: 1px solid #ccc;
-    padding: 5px;
-    border-radius: 4px;
-    width: 100%; /* Ensure inputs take full width of the cell */
-    padding: 0.5rem; /* Match table cell padding */
-    box-shadow: none !important; /* Remove any shadow */
+    padding: 0px; /* Remove padding */
+    border-radius: 4px; /* Slight rounding */
+    width: 100%; /* Ensure full width */
+    min-width: 100%; /* Prevent truncation */
+    vertical-align: middle; /* Align with table text */
+    margin: 0; /* Remove unwanted spacing */
+    box-shadow: none !important; /* Remove shadow */
 }
 
-.blendInputs:focus {
-    border: 1px solid #ddd !important; /* Optional: Add a subtle border on focus */
-}
+            .blendInputs:focus {
+                border: 1px solid #ddd !important; /* Optional: Add a subtle border on focus */
+            }
 
             .sidebar {
                 
@@ -94,10 +95,10 @@
                 background-color: rgb(55 65 81);
                 /* background-color:#312e8180; */
             }
-            .sidebar a:active {
+            /* .sidebar a:active {
                 background-color:#312e8180;
                 font-size:2rem;
-            }
+            } */
             .outbdr {
                 border:0px solid red;
                 padding-top:1rem;
@@ -110,6 +111,22 @@
             main {
                 outline: 0px solid red;
                 flex: 0 0 85%;
+            }
+            main table td {
+                /* padding: 0 !important; */
+                margin: 0;
+            }
+            main table td input[type=text] {
+                border: none !important; /* Remove borders */
+                background: transparent !important; /* Transparent background */
+                outline: none !important; /* Remove focus outline */
+                padding: 0px; /* Remove padding */
+                border-radius: 4px; /* Slight rounding */
+                width: 100%; /* Ensure full width */
+                min-width: 100%; /* Prevent truncation */
+                vertical-align: middle; /* Align with table text */
+                margin: 0; /* Remove unwanted spacing */
+                box-shadow: none !important; /* Remove shadow */
             }
         </style>
     </head>
