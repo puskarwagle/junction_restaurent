@@ -116,12 +116,18 @@ class CouponCodeController extends Component
             session()->flash('error', 'No records selected.');
         }
     }
-        
-    public function read(): array
+
+    private function readModel(): array
     {
         $modelInstance = new CouponCode;
         $fillable = $modelInstance->getFillable();
+        $query = $this->queryModel($fillable);
 
+        return $this->formatReturn($query, $fillable);
+    }
+
+    private function queryModel(array $fillable)
+    {
         $query = CouponCode::query();
 
         if (!empty($this->search)) {
@@ -132,17 +138,21 @@ class CouponCodeController extends Component
             });
         }
 
-        $query->orderBy($this->sortField, $this->sortDirection);
-        $paginatedResults = $query->paginate($this->perPage);
+        return $query->orderBy($this->sortField, $this->sortDirection)
+                    ->paginate($this->perPage);
+    }
 
+    private function formatReturn($query, $fillable): array
+    {
         return [
-            'tabledata' => $paginatedResults->items(),
+            'tabledata' => $query->map(fn($record) => $record->only($fillable))->toArray(),
             'fields' => $fillable,
+            'input_types' => $this->determineInputTypes($fillable),
             'pagination' => [
-                'current_page' => $paginatedResults->currentPage(),
-                'per_page' => $paginatedResults->perPage(),
-                'total' => $paginatedResults->total(),
-                'last_page' => $paginatedResults->lastPage(),
+                'current_page' => $query->currentPage(),
+                'per_page' => $query->perPage(),
+                'total' => $query->total(),
+                'last_page' => $query->lastPage(),
             ],
             'sort' => [
                 'field' => $this->sortField,
@@ -153,7 +163,27 @@ class CouponCodeController extends Component
             ],
         ];
     }
-    
+
+
+    private function determineInputTypes(array $fillable): array
+    {
+        $typeMapping = [
+            'email' => 'email',
+            'numeric' => 'number',
+            'integer' => 'number',
+            'date' => 'date',
+            'boolean' => 'checkbox',
+        ];
+
+        return array_map(function ($field) use ($typeMapping) {
+            $rules = explode('|', $this->rules[$field] ?? '');
+
+            return array_reduce($rules, function ($carry, $rule) use ($typeMapping) {
+                return $typeMapping[$rule] ?? $carry;
+            }, 'text');
+        }, array_combine($fillable, $fillable));
+    }
+
     public function goToPage(int $page): void
     {
         $this->gotoPage($page);
@@ -171,7 +201,8 @@ class CouponCodeController extends Component
 
     public function render(): View
     {
-        return view('CouponCode-cruds', $this->read())->layout('layouts.app');
+        dd($this->readModel()); // Debug the data before rendering the view
+        return view('CouponCode-cruds', $this->readModel())->layout('layouts.app');
     }
 
     private function fillableAttributes(): array

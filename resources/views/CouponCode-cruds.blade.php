@@ -3,7 +3,7 @@
     
     <!-- Search Input -->
     <div class="mb-3">
-        <input type="text" wire:model.live="search" placeholder="Search..." class="form-control blendinputs">
+        <input type="text" wire:model.live="search" placeholder="Search..." class="form-control">
     </div>
 
     <!-- Create and Delete Buttons -->
@@ -19,64 +19,61 @@
     
     <!-- Table -->
     <table class="table table-striped table-bordered">
-    <thead class="table-dark">
-        <tr>
-            <th><input type="checkbox" wire:model="selectAll" aria-label="Select all rows"></th>
-            <th wire:click="sortBy('id')">ID</th>
-            @foreach ($fields as $field)
-                @if (!in_array($field, ['id', 'created_at', 'updated_at']))
-                    <th wire:click="sortBy('{{ $field }}')">{{ ucfirst($field) }}</th>
-                @endif
+        <thead class="table-dark">
+            <tr>
+                <th><input type="checkbox" wire:model="selectAll" aria-label="Select all rows"></th> <!-- Checkbox column -->
+                <th wire:click="sortBy('id')">ID</th>
+                @foreach ($tabledata[0] ?? [] as $field => $value)
+                    @if (!in_array($field, ['id', 'created_at', 'updated_at'])) <!-- Exclude these fields -->
+                        <th wire:click="sortBy('{{ $field }}')">{{ ucfirst($field) }}</th>
+                    @endif
+                @endforeach
+                <th>Created At</th> <!-- Move created_at to the far right -->
+                <th>Updated At</th> <!-- Move updated_at to the far right -->
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Hidden Create Form -->
+            @if ($showCreateForm)
+                <tr>
+                    <td></td> <!-- Empty checkbox column -->
+                    <td>{{ $nextId }}</td> <!-- Display the next ID (max ID + 1) -->
+                    @foreach ($tabledata[0] ?? [] as $field => $value)
+                        @if (!in_array($field, ['id', 'created_at', 'updated_at'])) <!-- Exclude these fields -->
+                            <td>
+                                <input type="text" wire:model="{{ $field }}" class="form-control blendInputs" placeholder="Enter {{ ucfirst($field) }}">
+                            </td>
+                        @endif
+                    @endforeach
+                    <td></td> <!-- Empty created_at column -->
+                    <td></td> <!-- Empty updated_at column -->
+                </tr>
+            @endif
+
+            <!-- Table Data Rows -->
+            @foreach ($tabledata as $record)
+                <tr>
+                    <td>
+                        <input type="checkbox" wire:model="selectedIds" value="{{ $record['id'] }}" aria-label="Select row">
+                    </td>
+                    <td>{{ $record['id'] }}</td>
+                    @foreach ($record as $field => $value)
+                        @if (!in_array($field, ['id', 'created_at', 'updated_at'])) <!-- Exclude these fields -->
+                            <td>
+                                @if ($editingField === $field . '-' . $record['id'])
+                                <input type="text" wire:model="{{ $field }}" class="form-control blendInputs" placeholder="Enter {{ ucfirst($field) }}">
+                                @else
+                                    <span wire:click="incrementClick('{{ $field }}', {{ $record['id'] }}, '{{ $value }}')">{{ $value }}</span>
+                                @endif
+                            </td>
+                        @endif
+                    @endforeach
+                    <td>{{ $record['created_at'] }}</td> <!-- Display created_at -->
+                    <td>{{ $record['updated_at'] }}</td> <!-- Display updated_at -->
+                </tr>
             @endforeach
-            <th>Created At</th>
-            <th>Updated At</th>
-        </tr>
-    </thead>
-    <tbody>
-        @if ($showCreateForm)
-            <tr>
-                <td></td>
-                <td>{{ $nextId }}</td>
-                @foreach ($fields as $field)
-                    @if (!in_array($field, ['id', 'created_at', 'updated_at']))
-                        <td>
-                            <input type="text" wire:model.defer="newRecord.{{ $field }}" class="form-control blendinputs" placeholder="Enter {{ ucfirst($field) }}">
-                        </td>
-                    @endif
-                @endforeach
-                <td></td>
-                <td></td>
-            </tr>
-        @endif
-
-        @forelse ($tabledata as $record)
-            <tr>
-                <td><input type="checkbox" wire:model="selectedIds" value="{{ $record['id'] }}"></td>
-                <td>{{ $record['id'] }}</td>
-                @foreach ($fields as $field)
-                    @if (!in_array($field, ['id', 'created_at', 'updated_at']))
-                        <td>
-                            @if ($editingField === $field . '-' . $record['id'])
-                                <input type="text" wire:model="editingValue" class="form-control" wire:keydown.enter="saveModifiedField('{{ $field }}', {{ $record['id'] }})">
-                            @else
-                                <span wire:click="incrementClick('{{ $field }}', {{ $record['id'] }}, '{{ $record[$field] ?? '' }}')">
-                                    {{ $record[$field] ?? '' }}
-                                </span>
-                            @endif
-                        </td>
-                    @endif
-                @endforeach
-                <td>{{ $record['created_at'] }}</td>
-                <td>{{ $record['updated_at'] }}</td>
-            </tr>
-        @empty
-            <tr>
-                <td colspan="{{ count($fields) + 3 }}" class="text-center">No data available.</td>
-            </tr>
-        @endforelse
-    </tbody>
-</table>
-
+        </tbody>
+    </table>
     
     <!-- Pagination Controls -->
     <div class="d-flex justify-content-between align-items-center mt-3">

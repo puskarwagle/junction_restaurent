@@ -18,17 +18,6 @@ class CrudViewGenerator
         // Ensure the directory exists
         File::ensureDirectoryExists($viewsPath);
 
-        // Get the table columns and their types
-        /** @var Model $modelInstance */
-        $modelInstance = new $model;
-        $tableName = $modelInstance->getTable();
-        $columns = Schema::getColumnListing($tableName);
-        $columnTypes = [];
-
-        foreach ($columns as $column) {
-            $columnTypes[$column] = Schema::getColumnType($tableName, $column);
-        }
-
         // Generate the view content
         $viewContent = <<<EOD
 <div class="container mt-4">
@@ -74,7 +63,7 @@ class CrudViewGenerator
                     @foreach (\$tabledata[0] ?? [] as \$field => \$value)
                         @if (!in_array(\$field, ['id', 'created_at', 'updated_at'])) <!-- Exclude these fields -->
                             <td>
-                                <input type="{{ $this->getInputType($field, $columnTypes) }}" wire:model="{{ $field }}" class="form-control blendInputs" placeholder="Enter {{ ucfirst($field) }}">
+                                <input type="text" wire:model="{{ \$field }}" class="form-control blendInputs" placeholder="Enter {{ ucfirst(\$field) }}">
                             </td>
                         @endif
                     @endforeach
@@ -94,7 +83,7 @@ class CrudViewGenerator
                         @if (!in_array(\$field, ['id', 'created_at', 'updated_at'])) <!-- Exclude these fields -->
                             <td>
                                 @if (\$editingField === \$field . '-' . \$record['id'])
-                                <input type="{{ $this->getInputType($field, $columnTypes) }}" wire:model="{{ $field }}" class="form-control blendInputs" placeholder="Enter {{ ucfirst($field) }}">
+                                <input type="text" wire:model="{{ \$field }}" class="form-control blendInputs" placeholder="Enter {{ ucfirst(\$field) }}">
                                 @else
                                     <span wire:click="incrementClick('{{ \$field }}', {{ \$record['id'] }}, '{{ \$value }}')">{{ \$value }}</span>
                                 @endif
@@ -127,20 +116,5 @@ EOD;
 
         Log::info("View generated for $model at $viewFile");
         return true;
-    }
-
-    /**
-     * Get the input type based on the column type.
-     */
-    protected function getInputType(string $field, array $columnTypes): string
-    {
-        $type = $columnTypes[$field] ?? 'string';
-
-        return match ($type) {
-            'integer', 'bigint', 'decimal', 'float' => 'number',
-            'date', 'datetime' => 'date',
-            'boolean' => 'checkbox',
-            default => 'text',
-        };
     }
 }
