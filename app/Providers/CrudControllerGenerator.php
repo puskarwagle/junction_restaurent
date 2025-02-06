@@ -173,7 +173,7 @@ class CrudControllerGenerator
         private function formatReturn(\$query, \$fillable): array
         {
             return [
-                'tabledata' => \$query->map(fn(\$record) => \$record->only(\$fillable))->toArray(),
+                'tabledata' => \$query->map(fn(\$record) => \$record->getAttributes())->toArray(),
                 'fields' => \$fillable,
                 'input_types' => \$this->determineInputTypes(\$fillable),
                 'pagination' => [
