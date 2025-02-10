@@ -123,7 +123,7 @@
 
                             <div class="option-item">
                                 <div class="shapping-bag">
-                                    <a href="\cart" wire:navigate.hover>
+                                    <a href="/cart" wire:navigate.hover>
                                         <img src="assets/images/header/shopping-bag-icon.svg" alt="images">
                                     </a>
                                     <div class="shapping-text">
@@ -133,7 +133,7 @@
                             </div>
 
                             <div class="option-item">
-                                <a href="\bookingaTable" class="default-btn">Book A Table</a>
+                                <a href="/bookingaTable" class="default-btn">Book A Table</a>
                             </div>
                         </div>
                     </div>

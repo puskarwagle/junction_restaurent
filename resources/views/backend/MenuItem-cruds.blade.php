@@ -21,32 +21,32 @@
     <table class="table table-striped table-bordered">
         <thead class="table-dark">
             <tr>
-                <th><input type="checkbox" wire:model="selectAll" aria-label="Select all rows"></th> <!-- Checkbox column -->
+                <th><input type="checkbox" wire:model="selectAll" aria-label="Select all rows"></th>
                 <th wire:click="sortBy('id')">ID</th>
                 @foreach ($tabledata[0] ?? [] as $field => $value)
-                    @if (!in_array($field, ['id', 'created_at', 'updated_at'])) <!-- Exclude these fields -->
+                    @if (!in_array($field, ['id', 'created_at', 'updated_at']))
                         <th wire:click="sortBy('{{ $field }}')">{{ ucfirst($field) }}</th>
                     @endif
                 @endforeach
-                <th>Created At</th> <!-- Move created_at to the far right -->
-                <th>Updated At</th> <!-- Move updated_at to the far right -->
+                <th>Created At</th>
+                <th>Updated At</th>
             </tr>
         </thead>
         <tbody>
             <!-- Hidden Create Form -->
             @if ($showCreateForm)
                 <tr>
-                    <td></td> <!-- Empty checkbox column -->
-                    <td>{{ $nextId }}</td> <!-- Display the next ID (max ID + 1) -->
+                    <td></td>
+                    <td>{{ $nextId }}</td>
                     @foreach ($tabledata[0] ?? [] as $field => $value)
-                        @if (!in_array($field, ['id', 'created_at', 'updated_at'])) <!-- Exclude these fields -->
+                        @if (!in_array($field, ['id', 'created_at', 'updated_at']))
                             <td>
-                                <input type="text" wire:model="{{ $field }}" class="form-control blendInputs" placeholder="Enter {{ ucfirst($field) }}">
+                                <input type="{{ $input_types[$field] ?? 'text' }}" wire:model="{{ $field }}" class="form-control blendInputs" placeholder="Enter {{ ucfirst($field) }}">
                             </td>
                         @endif
                     @endforeach
-                    <td></td> <!-- Empty created_at column -->
-                    <td></td> <!-- Empty updated_at column -->
+                    <td></td>
+                    <td></td>
                 </tr>
             @endif
 
@@ -58,18 +58,23 @@
                     </td>
                     <td>{{ $record['id'] }}</td>
                     @foreach ($record as $field => $value)
-                        @if (!in_array($field, ['id', 'created_at', 'updated_at'])) <!-- Exclude these fields -->
-                            <td>
-                                @if ($editingField === $field . '-' . $record['id'])
-                                    <input type="text" wire:model="editingValue" class="form-control" wire:keydown.enter="saveModifiedField('{{ $field }}', {{ $record['id'] }})">
-                                @else
-                                    <span wire:click="incrementClick('{{ $field }}', {{ $record['id'] }}, '{{ $value }}')">{{ $value }}</span>
-                                @endif
-                            </td>
+                        @if (!in_array($field, ['id', 'created_at', 'updated_at']))
+                        <td>
+    @if ($editingField === $field . '-' . $record['id'])
+        <input type="{{ $input_types[$field] ?? 'text' }}"
+               wire:model.live="editingValue"
+               wire:keyup.enter="saveModifiedField('{{ $field }}', {{ $record['id'] }})"
+               wire:blur="saveModifiedField('{{ $field }}', {{ $record['id'] }})"
+               class="form-control blendInputs">
+    @else
+        <span wire:click="incrementClick('{{ $field }}', {{ $record['id'] }}, '{{ $value }}')">{{ $value }}</span>
+    @endif
+</td>
+
                         @endif
                     @endforeach
-                    <td>{{ $record['created_at'] }}</td> <!-- Display created_at -->
-                    <td>{{ $record['updated_at'] }}</td> <!-- Display updated_at -->
+                    <td>{{ $record['created_at'] }}</td>
+                    <td>{{ $record['updated_at'] }}</td>
                 </tr>
             @endforeach
         </tbody>
@@ -86,4 +91,11 @@
         <span>Page {{ $pagination['current_page'] }} of {{ $pagination['last_page'] }}</span>
         <span>{{ $pagination['total'] }} Total Records</span>
     </div>
+
+    @if (session()->has('message'))
+    <div class="alert alert-success border border-success p-2">
+        {{ session('message') }}
+    </div>
+@endif
+
 </div>

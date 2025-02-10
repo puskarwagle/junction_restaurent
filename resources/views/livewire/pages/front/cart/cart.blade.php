@@ -5,7 +5,7 @@
             <table class="table table-bordered">
                 <thead>
                     <tr>
-                        <th>Productff</th>
+                        <th>Products</th>
                         <th scope="col" class="cart-text">Name</th>
                         <th scope="col">Unit Price</th>
                         <th scope="col" class="cart-quantity">Quantity</th>
@@ -19,7 +19,9 @@
                             <th scope="col" class="table-img">
                                 <div class="table-icon">
                                     <a href="shop-single.html">
-                                        <img src="{{ asset($item['image_path']) }}" alt="images">
+                                    <img src="{{ asset($item['image_path']) }}"
+                                        alt="images"
+                                        style="width: 100px; height: 100px; object-fit: contain;">
                                     </a>
                                 </div>
                             </th>
@@ -54,49 +56,10 @@
                     @endforeach
                 </tbody>
             </table>
+            <p>Subtotal: $<span wire:poll.500ms="calculateTotals">{{ number_format($subtotal, 2) }}</span></p>
 
-            <div class="coupon-code">
-                <div class="row align-items-center">
-                    <div class="col-lg-6 col-md-6">
-                        <form class="coupon">
-                            <div class="mb-3">
-                                <div class="coupon-group-form">
-                                    <input type="text" class="form-control" placeholder="Coupon-Code">
-                                    <button type="submit" class="default-btn">
-                                        Apply Coupon<span></span>
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="col-lg-6 col-md-6">
-                        <div class="bottom">
-                            <a href="cart.html" class="default-btn">Update Cart<span></span></a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="checkout">
-            <div class="checkout-working">
-                <h2>Cart Totals</h2>
-                <ul>
-                    <li class="d-flex justify-content-between">
-                        <span>Subtotal</span>
-                        <span class="cart-number">${{ number_format($subtotal, 2) }}</span>
-                    </li>
-                    <li class="d-flex justify-content-between">
-                        <span>Shipping</span>
-                        <span class="cart-number">${{ number_format($shipping, 2) }}</span>
-                    </li>
-                    <li class="d-flex justify-content-between">
-                        <span>Total</span>
-                        <span class="cart-number-2">${{ number_format($total, 2) }}</span>
-                    </li>
-                </ul>
-                <!-- <a href="/checkout" wire:navigate class="default-btn">Proceed To Checkout<span></span></a> -->
-                <button wire:click="goToCheckout" class="btn btn-primary">Proceed to Checkout</button>
-            </div>
+            <button href="\checkout" wire:navigate class="btn btn-primary">Proceed to Checkout</button>
+
         </div>
     </div>
 </div>

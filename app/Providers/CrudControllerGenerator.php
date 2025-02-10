@@ -19,10 +19,15 @@ class CrudControllerGenerator
         if (!class_exists($modelImportPath)) {
             throw new Exception("Model $modelImportPath not found.");
         }
-    
+            
         $fillable = (new $modelImportPath)->getFillable();
-        $rulesString = implode(",\n        ", array_map(fn($f) => "'$f' => 'required'", $fillable));
-    
+        $properties = implode("\n    ", array_map(fn($f) => "public \$$f;", $fillable));
+
+        $rulesFile = base_path('app/Providers/marules.json');
+        $rulesData = json_decode(file_get_contents($rulesFile), true);
+        $rulesArray = $rulesData[$controllerClass]['rules'] ?? [];
+        $rulesString = implode(",\n        ", array_map(fn($k, $v) => "'$k' => '$v'", array_keys($rulesArray), $rulesArray));
+        
         $viewName = $model;
         $layoutName = 'layouts.app';
     
@@ -57,6 +62,8 @@ class CrudControllerGenerator
         public string \$sortDirection = 'asc';
         public int \$perPage = 10;
     
+        $properties
+        
         protected array \$rules = [
             $rulesString
         ];
@@ -84,7 +91,7 @@ class CrudControllerGenerator
     
         public function create(): void
         {
-            \$this->validate();
+            \$this->validate(\$this->rules);
     
             try {
                 $model::create(\$this->only(...\$this->fillableAttributes()));
@@ -229,8 +236,8 @@ class CrudControllerGenerator
     
         public function render(): View
         {
-            dd(\$this->readModel()); // Debug the data before rendering the view
-            return view('$viewName-cruds', \$this->readModel())->layout('$layoutName');
+            // dd(\$this->readModel()); // Debug the data before rendering the view
+            return view('backend.$viewName-cruds', \$this->readModel())->layout('$layoutName');
         }
     
         private function fillableAttributes(): array

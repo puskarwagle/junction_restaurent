@@ -1,32 +1,31 @@
 <?php
-
 namespace App\Livewire\Frontend;
 
 use Illuminate\Http\Request;
-use App\Providers\CartService;
 use App\Models\MenuItem;
 use Livewire\Component;
 
 class Checkout extends Component
 {
-    
-    protected $cartService;
-
     public $subtotal, $shipping, $total;
+    public $couponCode, $discount = 0, $error;
     public $cartItems = [];
 
     public function mount()
     {
+        // dd(session()->all()); // This will show all session data
+
         $totals = session()->get('checkout_totals', [
             'subtotal' => 0,
             'shipping' => 0,
             'total' => 0,
         ]);
-    
+
         $this->subtotal = $totals['subtotal'];
         $this->shipping = $totals['shipping'];
         $this->total = $totals['total'];
 
+        // Fetch cart items directly from session
         $cart = session()->get('cart', []);
         foreach ($cart as $itemId => $quantity) {
             $item = MenuItem::find($itemId);
@@ -40,21 +39,35 @@ class Checkout extends Component
         }
     }
 
-    public function __construct()
+    public function applyCoupon()
     {
-        $this->cartService = new CartService();
+        $coupon = CouponCode::where('coupon', $this->couponCode)
+            ->where('expiration_date', '>=', now())
+            ->first();
+
+        if ($coupon) {
+            $this->discount = $coupon->amount;
+            $this->error = null;
+        } else {
+            $this->error = 'Invalid or expired coupon.';
+            $this->discount = 0;
+        }
     }
 
     public function index()
     {
-        // Fetch cart items from the session
-        $cartItems = $this->cartService->getCart();
+        // Fetch cart items directly from the session
+        $cartItems = session()->get('cart', []);
 
         // Calculate totals
         $subtotal = 0;
-        foreach ($cartItems as $item) {
-            $subtotal += $item['price'] * $item['quantity'];
+        foreach ($cartItems as $itemId => $quantity) {
+            $item = MenuItem::find($itemId);
+            if ($item) {
+                $subtotal += $item->price * $quantity;
+            }
         }
+
         $shipping = 30; // Static shipping cost
         $total = $subtotal + $shipping;
 
@@ -82,18 +95,18 @@ class Checkout extends Component
         // For now, we'll just clear the cart and redirect to a success page.
 
         // Clear the cart
-        $this->cartService->clearCart();
+        session()->forget('cart');
 
         // Redirect to the success page
-        return redirect()->route('checkout.success')->with('success', 'Payment processed successfully!');
+        return redirect()->route('checkout.delivery')->with('success', 'Payment processed successfully!');
     }
 
     public function render()
     {
-        return view('frontend.checkout');
+        return view('livewire.pages.front.checkout.checkout');
     }
 
-    public function success()
+    public function delivery()
     {
         return view('checkout-success');
     }

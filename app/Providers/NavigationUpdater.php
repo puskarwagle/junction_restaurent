@@ -9,7 +9,9 @@ class NavigationUpdater
 {
     public function update($model, $viewsPath)
     {
-        $navFilePath = "$viewsPath/livewire/layout/navigation.blade.php";
+        // $navFilePath = "$viewsPath/livewire/layout/navigation.blade.php";
+        $navFilePath = "resources/views/livewire/layout/navigation.blade.php";
+
         $routeName = Str::snake(Str::plural($model));
         $routeLabel = Str::plural($model);
 

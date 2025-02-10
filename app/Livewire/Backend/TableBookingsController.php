@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Livewire;
+namespace App\Livewire\Backend;
 
 use Livewire\Attributes\Layout;
-use App\Models\CouponCode;
+use App\Models\TableBookings;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\WithFileUploads;
@@ -11,7 +11,7 @@ use Exception;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 
-class CouponCodeController extends Component
+class TableBookingsController extends Component
 {
     use WithFileUploads, WithPagination;
 
@@ -27,10 +27,14 @@ class CouponCodeController extends Component
     public string $sortDirection = 'asc';
     public int $perPage = 10;
 
+    public $name;
+    public $phone;
+    public $persons;
+    public $date;
+    public $time;
+    
     protected array $rules = [
-        'coupon' => 'required',
-        'amount' => 'required',
-        'expiration_date' => 'required'
+        
     ];
 
     public function mount(): void
@@ -50,22 +54,22 @@ class CouponCodeController extends Component
 
     public function calculateNextId(): void
     {
-        $maxId = CouponCode::max('id');
+        $maxId = TableBookings::max('id');
         $this->nextId = $maxId ? $maxId + 1 : 1;
     }
 
     public function create(): void
     {
-        $this->validate();
+        $this->validate($this->rules);
 
         try {
-            CouponCode::create($this->only(...$this->fillableAttributes()));
-            session()->flash('message', 'CouponCode created successfully.');
+            TableBookings::create($this->only(...$this->fillableAttributes()));
+            session()->flash('message', 'TableBookings created successfully.');
             $this->reset([...$this->fillableAttributes(), 'showCreateForm']);
             $this->calculateNextId();
         } catch (Exception $e) {
-            session()->flash('error', 'Failed to create ' . CouponCode . ': ' . $e->getMessage());
-            Log::error('Error creating ' . CouponCode . ': ' . $e->getMessage());
+            session()->flash('error', 'Failed to create ' . TableBookings . ': ' . $e->getMessage());
+            Log::error('Error creating ' . TableBookings . ': ' . $e->getMessage());
         }
     }
 
@@ -83,7 +87,7 @@ class CouponCodeController extends Component
 
     public function saveModifiedField(string $field, int $id): void
     {
-        $record = CouponCode::find($id);
+        $record = TableBookings::find($id);
 
         if (!$record) {
             session()->flash('error', 'Record not found.');
@@ -109,7 +113,7 @@ class CouponCodeController extends Component
     public function delete(): void
     {
         if (!empty($this->selectedIds)) {
-            CouponCode::whereIn('id', $this->selectedIds)->delete();
+            TableBookings::whereIn('id', $this->selectedIds)->delete();
             session()->flash('message', 'Selected records deleted successfully.');
             $this->selectedIds = [];
         } else {
@@ -119,7 +123,7 @@ class CouponCodeController extends Component
 
     private function readModel(): array
     {
-        $modelInstance = new CouponCode;
+        $modelInstance = new TableBookings;
         $fillable = $modelInstance->getFillable();
         $query = $this->queryModel($fillable);
 
@@ -128,7 +132,7 @@ class CouponCodeController extends Component
 
     private function queryModel(array $fillable)
     {
-        $query = CouponCode::query();
+        $query = TableBookings::query();
 
         if (!empty($this->search)) {
             $query->where(function($q) use ($fillable) {
@@ -201,12 +205,12 @@ class CouponCodeController extends Component
 
     public function render(): View
     {
-        dd($this->readModel()); // Debug the data before rendering the view
-        return view('CouponCode-cruds', $this->readModel())->layout('layouts.app');
+        // dd($this->readModel()); // Debug the data before rendering the view
+        return view('backend.TableBookings-cruds', $this->readModel())->layout('layouts.app');
     }
 
     private function fillableAttributes(): array
     {
-        return (new CouponCode)->getFillable();
+        return (new TableBookings)->getFillable();
     }
 }

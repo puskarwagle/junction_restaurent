@@ -9,9 +9,9 @@ use Illuminate\Support\Facades\Log;
 
 class Cart extends Component
 {
-    public $cartItems = []; // Array to hold cart items
+    public $cartItems = [];
     public $subtotal = 0;
-    public $shipping = 30; // Static shipping cost
+    public $shipping = 30;
     public $total = 0;
 
     protected $listeners = ['addItem' => 'addItem'];
@@ -28,11 +28,13 @@ class Cart extends Component
     $this->loadCart();
 }
 
-protected function loadCart()
+public function loadCart()
 {
     $cart = $this->cartService->getCart();
     $this->cartItems = [];
-
+    $this->subtotal = 0;  // Initialize subtotal to 0
+    $this->shipping = 30;  // Set static shipping cost
+    
     foreach ($cart as $itemId => $quantity) {
         $item = MenuItem::find($itemId);
         if ($item) {
@@ -43,11 +45,23 @@ protected function loadCart()
                 'image_path' => $item->image_path,
                 'quantity' => $quantity,
             ];
+
+            // Calculate the subtotal
+            $this->subtotal += $item->price * $quantity;
         }
     }
 
-    $this->calculateTotals();
+    // Calculate total (subtotal + shipping)
+    $this->total = $this->subtotal + $this->shipping;
+
+    // Store subtotal, shipping, and total in session
+    session()->put('checkout_totals', [
+        'subtotal' => $this->subtotal,
+        'shipping' => $this->shipping,
+        'total' => $this->total,
+    ]);
 }
+
 
 public function addItem($itemId)
 {
@@ -81,7 +95,7 @@ public function removeItem($itemId)
 }
 
 
-    protected function calculateTotals()
+    public function calculateTotals()
     {
         $this->subtotal = 0;
         foreach ($this->cartItems as $item) {

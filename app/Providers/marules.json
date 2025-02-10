@@ -1,0 +1,48 @@
+{
+    "CouponCodeController": {
+        "rules": {
+            "coupon": "required|string|unique:coupons,code|max:255",
+            "amount": "required|numeric|min:0",
+            "expiration_date": "required|date|after_or_equal:today"
+        }
+    },
+    "MenuItemController": {
+        "rules": {
+            "name": "required|string|max:255",
+            "price": "required|numeric|min:0",
+            "image_path": "nullable|string",
+            "description": "nullable|string",
+            "type": "required|string|max:50",
+            "discount": "nullable|numeric|min:0|max:100",
+            "is_special": "boolean"
+        }
+    },
+    "OrderController": {
+        "rules": {
+            "menu_items_id": "required|exists:menu_items,id",
+            "coupon_code_id": "nullable|exists:coupon_codes,id",
+            "quantity": "required|integer|min:1",
+            "total_price": "required|numeric|min:0",
+            "customer_name": "required|string|max:255",
+            "customer_phone": "required|string|max:20",
+            "customer_email": "required|email|max:255"
+        }
+    },
+    "UserController": {
+        "rules": {
+            "name": "required|string|max:255",
+            "email": "required|email|unique:users,email|max:255",
+            "type": "required|string|in:admin,manager,user",
+            "password": "required|string|min:8|confirmed"
+        }
+    },
+    "TableBookingsController": {
+        "rules": {
+            "name": "required|string|max:255",
+            "phone": "required|string|max:20",
+            "persons": "required|integer|min:1",
+            "date": "required|date|after_or_equal:today",
+            "time": "required|date_format:H:i"
+        }
+    }
+}

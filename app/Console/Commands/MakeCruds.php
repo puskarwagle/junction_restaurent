@@ -20,7 +20,7 @@ class MakeCruds extends Command
     // Test values for quick testing
     protected string $testModel = 'SiteSettings';
     protected string $testControllerPath = 'app/Livewire/SiteSettings';
-    protected string $testViewsPath = 'resources/views';
+    protected string $testViewsPath = 'resources/views/backend/';
 
     public function handle(): void
     {
@@ -35,9 +35,9 @@ class MakeCruds extends Command
         $model = $this->choice('Select a model to generate CRUD for:', $models);
     
         // Define paths for controller and views
-        $controllerPath = $this->ask('Enter the controller path (default: app/Livewire/)', 'app/Livewire');
-        $viewsPath = $this->ask('Enter the views path (default: resources/views)', 'resources/views');
-    
+        $controllerPath = $this->ask('Enter the controller path (default: app/Livewire/Backend/)', 'app/Livewire/Backend');
+        $viewsPath = $this->ask('Enter the views path (default: resources/views/backend/)', 'resources/views/backend');
+        
         // Generate the fully qualified controller class name
         $controllerClass = str_replace('/', '\\', ucfirst($controllerPath)) . '\\' . $model . 'Controller';
         $controllerFile = base_path($controllerPath . '/' . $model . 'Controller.php');
@@ -69,7 +69,7 @@ class MakeCruds extends Command
                 $this->info("✅ Table already exists for $model.");
             }
     
-            // Step 3: Generate Controller (simplified)
+            // Step 3: Generate Controller
             $this->generateFile(
                 $controllerFile,
                 fn() => (new CrudControllerGenerator())->generate($model, $controllerPath),
@@ -78,7 +78,7 @@ class MakeCruds extends Command
                 "✅ Controller generated successfully for $model.\n"
             );
     
-            // Step 4: Generate View (simplified)
+            // Step 4: Generate View
             $this->generateFile(
                 $viewFile,
                 fn() => (new CrudViewGenerator())->generate($model, $viewsPath),
