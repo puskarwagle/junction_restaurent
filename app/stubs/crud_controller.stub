@@ -1,5 +1,5 @@
 <?php
-// stub is not php dont worry when if it shows red
+
 namespace {{ namespace }};
 
 use Livewire\Attributes\Layout;
@@ -29,7 +29,7 @@ class {{ controllerClass }} extends Component
 
     {{ properties }}
 
-    protected array $rules = [
+    public array $rules = [
         {{ rulesString }}
     ];
 
@@ -64,14 +64,14 @@ class {{ controllerClass }} extends Component
             $this->reset([...$this->fillableAttributes(), 'showCreateForm']);
             $this->calculateNextId();
         } catch (Exception $e) {
-            session()->flash('error', 'Failed to create ' . {{ model }} . ': ' . $e->getMessage());
-            Log::error('Error creating ' . {{ model }} . ': ' . $e->getMessage());
+            session()->flash('error', 'Failed to create {{ model }}: ' . $e->getMessage());
+            Log::error('Error creating {{ model }}: ' . $e->getMessage());
         }
     }
 
     public function incrementClick(string $field, int $id, mixed $value): void
     {
-        $key = "\$field-\$id";
+        $key = "{$field}-{$id}";
         $this->clickCount[$key] = ($this->clickCount[$key] ?? 0) + 1;
 
         if ($this->clickCount[$key] === 4) {
@@ -104,6 +104,8 @@ class {{ controllerClass }} extends Component
 
         $this->editingField = null;
         $this->editingValue = '';
+
+        session()->flash('message', 'Saved successfully.');
     }
 
     public function delete(): void

@@ -11,7 +11,7 @@
         <button wire:click="$toggle('showCreateForm')" class="btn btn-sm {{$showCreateForm ? 'btn-warning' : 'btn-primary' }}">
             {{$showCreateForm ? 'Cancel' : 'Create New' }}
         </button>
-        <button wire:click="delete" class="btn btn-danger-live btn-sm">Delete</button>
+        <button wire:click="delete" class="btn btn-danger btn-sm">Delete</button>
         @if ($showCreateForm)
             <button wire:click="create" class="btn btn-success btn-sm">Save</button>
         @endif
@@ -61,7 +61,11 @@
                     @if (!in_array($field, ['id', 'created_at', 'updated_at']))
                         <td>
                             @if ($editingField === $field . '-' . $record['id'])
-                                <input type="{{ $input_types[$field] ?? 'text' }}" wire:model="{{ $field }}" class="form-control blendInputs" placeholder="Enter {{ ucfirst($field) }}">
+                            <input type="{{ $input_types[$field] ?? 'text' }}" 
+                                wire:model.defer="editingValue" 
+                                class="form-control blendInputs" 
+                                placeholder="Enter {{ ucfirst($field) }}" 
+                                wire:blur="saveModifiedField('{{ $field }}', {{ $record['id'] }})">
                             @else
                                 <span wire:click="incrementClick('{{ $field }}', {{ $record['id'] }}, '{{ $value }}')">{{ $value }}</span>
                             @endif

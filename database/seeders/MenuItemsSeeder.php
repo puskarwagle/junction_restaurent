@@ -12,9 +12,10 @@ class MenuItemsSeeder extends Seeder
     {
         DB::table('menu_items')->insert([
             [
-                'name' => 'Spring Rolls',
+                'name' => 'Bspring Rolls',
                 'description' => 'Crispy rolls stuffed with vegetables.',
-                'price' => 4.99,
+                'highPrice' => 4.99,
+                'realPrice' => 3.99,
                 'type' => 'starter',
                 'image_path' => '/assets/images/menu/menu-1.webp',
                 'created_at' => Carbon::now(),
@@ -23,7 +24,8 @@ class MenuItemsSeeder extends Seeder
             [
                 'name' => 'Chicken Wings',
                 'description' => 'Spicy grilled chicken wings.',
-                'price' => 6.99,
+                'highPrice' => 6.99,
+                'realPrice' => 5.99,
                 'type' => 'starter',
                 'image_path' => '/assets/images/menu/menu-2.webp',
                 'created_at' => Carbon::now(),
@@ -32,7 +34,8 @@ class MenuItemsSeeder extends Seeder
             [
                 'name' => 'Tomato Soup',
                 'description' => 'Rich and creamy tomato soup.',
-                'price' => 3.99,
+                'highPrice' => 3.99,
+                'realPrice' => 2.99,
                 'type' => 'starter',
                 'image_path' => '/assets/images/menu/menu-3.webp',
                 'created_at' => Carbon::now(),
@@ -41,7 +44,8 @@ class MenuItemsSeeder extends Seeder
             [
                 'name' => 'Grilled Chicken',
                 'description' => 'Juicy grilled chicken breast.',
-                'price' => 12.99,
+                'highPrice' => 12.99,
+                'realPrice' => 10.99,
                 'type' => 'mains',
                 'image_path' => '/assets/images/menu/menu-4.webp',
                 'created_at' => Carbon::now(),
@@ -50,7 +54,8 @@ class MenuItemsSeeder extends Seeder
             [
                 'name' => 'Beef Steak',
                 'description' => 'Tender and flavorful beef steak.',
-                'price' => 15.99,
+                'highPrice' => 15.99,
+                'realPrice' => 13.99,
                 'type' => 'mains',
                 'image_path' => '/assets/images/menu/menu-5.webp',
                 'created_at' => Carbon::now(),
@@ -59,7 +64,8 @@ class MenuItemsSeeder extends Seeder
             [
                 'name' => 'Vegetable Stir Fry',
                 'description' => 'Mixed vegetables sautéed in a savory sauce.',
-                'price' => 10.99,
+                'highPrice' => 10.99,
+                'realPrice' => 8.99,
                 'type' => 'mains',
                 'image_path' => '/assets/images/menu/menu-6.webp',
                 'created_at' => Carbon::now(),
@@ -68,7 +74,8 @@ class MenuItemsSeeder extends Seeder
             [
                 'name' => 'Chicken Momo',
                 'description' => 'Steamed dumplings filled with minced chicken.',
-                'price' => 8.99,
+                'highPrice' => 8.99,
+                'realPrice' => 7.49,
                 'type' => 'momo',
                 'image_path' => '/assets/images/menu/menu-1.webp',
                 'created_at' => Carbon::now(),
@@ -77,7 +84,8 @@ class MenuItemsSeeder extends Seeder
             [
                 'name' => 'Vegetable Momo',
                 'description' => 'Dumplings stuffed with fresh veggies.',
-                'price' => 7.99,
+                'highPrice' => 7.99,
+                'realPrice' => 6.49,
                 'type' => 'momo',
                 'image_path' => '/assets/images/menu/menu-1.webp',
                 'created_at' => Carbon::now(),
@@ -86,7 +94,8 @@ class MenuItemsSeeder extends Seeder
             [
                 'name' => 'Chocolate Milkshake',
                 'description' => 'Rich and creamy chocolate milkshake.',
-                'price' => 4.99,
+                'highPrice' => 4.99,
+                'realPrice' => 3.99,
                 'type' => 'beverage',
                 'image_path' => '/assets/images/menu/menu-three-4.webp',
                 'created_at' => Carbon::now(),
@@ -95,7 +104,8 @@ class MenuItemsSeeder extends Seeder
             [
                 'name' => 'Lemonade',
                 'description' => 'Refreshing homemade lemonade.',
-                'price' => 2.99,
+                'highPrice' => 2.99,
+                'realPrice' => 1.99,
                 'type' => 'beverage',
                 'image_path' => '/assets/images/menu/menu-three-1.webp',
                 'created_at' => Carbon::now(),
@@ -104,7 +114,8 @@ class MenuItemsSeeder extends Seeder
             [
                 'name' => 'Chicken Nuggets',
                 'description' => 'Crispy chicken nuggets for kids.',
-                'price' => 5.99,
+                'highPrice' => 5.99,
+                'realPrice' => 4.49,
                 'type' => 'kids',
                 'image_path' => '/assets/images/menu/menu-three-2.webp',
                 'created_at' => Carbon::now(),
@@ -113,13 +124,13 @@ class MenuItemsSeeder extends Seeder
             [
                 'name' => 'Mac and Cheese',
                 'description' => 'Creamy macaroni and cheese for kids.',
-                'price' => 6.49,
+                'highPrice' => 6.49,
+                'realPrice' => 5.49,
                 'type' => 'kids',
                 'image_path' => '/assets/images/menu/menu-three-3.webp',
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
             ],
-        ]);        
+        ]);
     }
 }
-

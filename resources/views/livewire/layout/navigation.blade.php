@@ -34,24 +34,7 @@ $logout = function (Logout $logout) {
                     </x-nav-link>
                 </div>
 
-                <div class="hidden sm:-my-px sm:flex">
-                    <x-nav-link :href="route('table_bookings')" :active="request()->routeIs('table_bookings')" wire:navigate>
-                        {{ __('TableBookings') }}
-                    </x-nav-link>
-                </div>
 
-
-                <div class="hidden sm:-my-px sm:flex">
-                    <x-nav-link :href="route('site_settings')" :active="request()->routeIs('site_settings')" wire:navigate>
-                        {{ __('SiteSettings') }}
-                    </x-nav-link>
-                </div>
-
-<div class="hidden sm:-my-px sm:flex">
-    <x-nav-link :href="route('coupon_codes')" :active="request()->routeIs('coupon_codes')" wire:navigate>
-        {{ __('CouponCodes') }}
-    </x-nav-link>
-</div>
 
 
 
@@ -94,25 +77,6 @@ $logout = function (Logout $logout) {
                 {{ __('MenuItems') }}
             </x-responsive-nav-link>
         </div>
-
-        <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('table_bookings')" :active="request()->routeIs('table_bookings')" wire:navigate>
-                {{ __('TableBookings') }}
-            </x-responsive-nav-link>
-        </div>
-
-
-        <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('site_settings')" :active="request()->routeIs('site_settings')" wire:navigate>
-                {{ __('SiteSettings') }}
-            </x-responsive-nav-link>
-        </div>
-
-<div class="pt-2 pb-3 space-y-1">
-    <x-responsive-nav-link :href="route('coupon_codes')" :active="request()->routeIs('coupon_codes')" wire:navigate>
-        {{ __('CouponCodes') }}
-    </x-responsive-nav-link>
-</div>
 
 
 

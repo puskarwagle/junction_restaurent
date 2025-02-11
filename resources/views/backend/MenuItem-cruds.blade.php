@@ -61,7 +61,11 @@
                     @if (!in_array($field, ['id', 'created_at', 'updated_at']))
                         <td>
                             @if ($editingField === $field . '-' . $record['id'])
-                                <input type="{{ $input_types[$field] ?? 'text' }}" wire:model="{{ $field }}" class="form-control blendInputs" placeholder="Enter {{ ucfirst($field) }}">
+                            <input type="{{ $input_types[$field] ?? 'text' }}" 
+                                wire:model="editingValue" 
+                                class="form-control blendInputs" 
+                                placeholder="Enter {{ ucfirst($field) }}" 
+                                wire:blur="saveModifiedField('{{ $field }}', {{ $record['id'] }})">
                             @else
                                 <span wire:click="incrementClick('{{ $field }}', {{ $record['id'] }}, '{{ $value }}')">{{ $value }}</span>
                             @endif

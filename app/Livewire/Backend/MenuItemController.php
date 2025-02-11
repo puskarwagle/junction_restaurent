@@ -9,6 +9,7 @@ use Livewire\WithPagination;
 use Livewire\WithFileUploads;
 use Exception;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\View\View;
 
 class MenuItemController extends Component
@@ -28,16 +29,18 @@ class MenuItemController extends Component
     public int $perPage = 10;
 
     public $name;
-    public $price;
+    public $highPrice;
+    public $realPrice;
     public $image_path;
     public $description;
     public $type;
     public $discount;
     public $is_special;
 
-    protected array $rules = [
+    public array $rules = [
         'name' => 'required|string|max:255',
-        'price' => 'required|numeric|min:0',
+        'highPrice' => 'required|numeric|min:0',
+        'realPrice' => 'required|numeric|min:0',
         'image_path' => 'nullable|string',
         'description' => 'nullable|string',
         'type' => 'required|string|max:50',
@@ -76,14 +79,14 @@ class MenuItemController extends Component
             $this->reset([...$this->fillableAttributes(), 'showCreateForm']);
             $this->calculateNextId();
         } catch (Exception $e) {
-            session()->flash('error', 'Failed to create ' . MenuItem . ': ' . $e->getMessage());
-            Log::error('Error creating ' . MenuItem . ': ' . $e->getMessage());
+            session()->flash('error', 'Failed to create ' . 'MenuItem' . ': ' . $e->getMessage());
+            Log::error('Error creating ' . 'MenuItem' . ': ' . $e->getMessage());
         }
     }
 
     public function incrementClick(string $field, int $id, mixed $value): void
     {
-        $key = "\$field-\$id";
+        $key = "{$field}-{$id}";
         $this->clickCount[$key] = ($this->clickCount[$key] ?? 0) + 1;
 
         if ($this->clickCount[$key] === 4) {
@@ -95,29 +98,47 @@ class MenuItemController extends Component
 
     public function saveModifiedField(string $field, int $id): void
     {
+        Log::info("saveModifiedField triggered", [
+            'field' => $field,
+            'id' => $id,
+            'value' => $this->editingValue
+        ]);
+    
         $record = MenuItem::find($id);
-
+    
         if (!$record) {
             session()->flash('error', 'Record not found.');
             return;
         }
-
+    
+        // If the field exists in the rules, validate it
+        $validationRule = $this->rules[$field] ?? 'required';
+        
+        // Manually validate the input
+        $validator = Validator::make([$field => $this->editingValue], [
+            $field => $validationRule
+        ]);
+    
+        if ($validator->fails()) {
+            // Handle validation errors
+            session()->flash('error', 'Validation failed: ' . $validator->errors()->first());
+            return;
+        }
+    
         if (!in_array($field, $record->getFillable(), true)) {
             session()->flash('error', 'Field cannot be edited.');
             return;
         }
-
-        $this->validate([
-            $field => $this->rules[$field] ?? 'required',
-        ]);
-
+    
         $record->$field = $this->editingValue;
         $record->save();
-
+    
         $this->editingField = null;
         $this->editingValue = '';
+    
+        session()->flash('message', 'Saved successfully.');
     }
-
+    
     public function delete(): void
     {
         if (!empty($this->selectedIds)) {
@@ -212,7 +233,7 @@ class MenuItemController extends Component
 
     public function render(): View
     {
-        dd($this->readModel()); // Debug the data before rendering the view
+        // dd($this->readModel()); // Debug the data before rendering the view
         return view('backend.MenuItem-cruds', $this->readModel())->layout('layouts.app');
     }
 
