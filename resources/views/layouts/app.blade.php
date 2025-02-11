@@ -33,6 +33,7 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
         <style>
+
             .header {
                 display: flex;
                 justify-content: space-between;
@@ -52,18 +53,47 @@
 
             }
             .blendInputs[type=text] {
-    border: none !important; /* Remove borders */
-    background: transparent !important; /* Transparent background */
-    outline: none !important; /* Remove focus outline */
-    padding: 0px; /* Remove padding */
-    border-radius: 4px; /* Slight rounding */
-    width: 100%; /* Ensure full width */
-    min-width: 100%; /* Prevent truncation */
-    vertical-align: middle; /* Align with table text */
-    margin: 0; /* Remove unwanted spacing */
-    box-shadow: none !important; /* Remove shadow */
-}
+                border: none !important; /* Remove borders */
+                background: transparent !important; /* Transparent background */
+                outline: none !important; /* Remove focus outline */
+                padding: 0px; /* Remove padding */
+                border-radius: 4px; /* Slight rounding */
+                width: 100%; /* Ensure full width */
+                min-width: 100%; /* Prevent truncation */
+                vertical-align: middle; /* Align with table text */
+                margin: 0; /* Remove unwanted spacing */
+                box-shadow: none !important; /* Remove shadow */
+            }
 
+            .btn-primary, .btn-primary:active, .btn-primary:visited {
+                background-color:rgb(4, 114, 37) !important;;
+                border-color: rgb(5, 98, 33) !important;; 
+            }
+            .btn-primary:hover{
+                background-color:rgb(5, 86, 29) !important;
+                border-color: rgb(5, 98, 33) !important;
+                color: #ffffff;
+            }
+            .btn-primary:active, .btn-primary:visited {
+                background-color:rgb(5, 86, 29) !important;
+                border-color: #ffffff !important;
+                color: #ffffff;
+            }
+            
+            .darr{
+                background-color:rgb(98, 5, 34);
+                border-color: rgb(98, 5, 34);
+                color: #ffffff;
+            }
+            .darr:hover{
+                background-color:rgb(72, 8, 28);
+                border-color: rgb(72, 8, 28);
+            }
+            
+            .darr:focus {
+                background-color:rgb(72, 8, 28);
+                border-color: rgb(72, 8, 28);
+            }
             .blendInputs:focus {
                 border: 1px solid #ddd !important; /* Optional: Add a subtle border on focus */
             }
@@ -101,6 +131,7 @@
             } */
             .outbdr {
                 border:0px solid red;
+                background-color: rgb(17 24 39);
                 padding-top:1rem;
             }
             .nav-container {
@@ -132,7 +163,7 @@
     </head>
     <body class="font-sans antialiased">
     <livewire:layout.header />
-        <div class="flex min-h-screen min-w-screen outbdr bg-gray-100 dark:bg-gray-900">
+        <div class="flex min-h-screen min-w-screen outbdr">
             <livewire:layout.navigation />
             <main>
                 {{ $slot }}

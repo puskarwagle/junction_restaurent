@@ -11,9 +11,9 @@
         <button wire:click="$toggle('showCreateForm')" class="btn btn-sm {{$showCreateForm ? 'btn-warning' : 'btn-primary' }}">
             {{$showCreateForm ? 'Cancel' : 'Create New' }}
         </button>
-        <button wire:click="delete" class="btn btn-danger btn-sm">Delete</button>
+        <button wire:click="delete" class="btn btn-danger darr btn-sm">Delete</button>
         @if ($showCreateForm)
-        <button wire:click="create" class="btn btn-success btn-sm">Save</button>
+        <button wire:click="create" class="btn btn-sm">Save</button>
         @endif
     </div>
     

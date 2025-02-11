@@ -33,7 +33,7 @@ Route::get('dashboard', DashboardController::class)
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
-Route::view('profile', 'livewire.pages.back.profile')
+Route::view('profile', 'livewire.pages.backend.profile')
     ->middleware(['auth', 'verified'])
     ->name('profile');
 
