@@ -1,5 +1,5 @@
 <?php
-
+// stub is not php dont worry when if it shows red
 namespace {{ namespace }};
 
 use Livewire\Attributes\Layout;
