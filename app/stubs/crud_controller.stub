@@ -9,6 +9,7 @@ use Livewire\WithPagination;
 use Livewire\WithFileUploads;
 use Exception;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\View\View;
 
 class {{ controllerClass }} extends Component
@@ -95,9 +96,18 @@ class {{ controllerClass }} extends Component
             return;
         }
 
-        $this->validate([
-            $field => $this->rules[$field] ?? 'required',
+        // If the field exists in the rules, validate it
+        $validationRule = $this->rules[$field] ?? 'required';
+        
+        // Manually validate the input
+        $validator = Validator::make([$field => $this->editingValue], [
+            $field => $validationRule
         ]);
+    
+        if ($validator->fails()) {
+            session()->flash('error', 'Validation failed: ' . $validator->errors()->first());
+            return;
+        }
 
         $record->$field = $this->editingValue;
         $record->save();

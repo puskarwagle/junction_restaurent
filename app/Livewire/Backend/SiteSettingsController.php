@@ -9,6 +9,7 @@ use Livewire\WithPagination;
 use Livewire\WithFileUploads;
 use Exception;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\View\View;
 
 class SiteSettingsController extends Component
@@ -29,9 +30,10 @@ class SiteSettingsController extends Component
 
     public $key;
     public $value;
-    
-    protected array $rules = [
-        
+
+    public array $rules = [
+        "key" => "required|string",
+        "value" => "required|string"
     ];
 
     public function mount(): void
@@ -65,14 +67,14 @@ class SiteSettingsController extends Component
             $this->reset([...$this->fillableAttributes(), 'showCreateForm']);
             $this->calculateNextId();
         } catch (Exception $e) {
-            session()->flash('error', 'Failed to create ' . SiteSettings . ': ' . $e->getMessage());
-            Log::error('Error creating ' . SiteSettings . ': ' . $e->getMessage());
+            session()->flash('error', 'Failed to create SiteSettings: ' . $e->getMessage());
+            Log::error('Error creating SiteSettings: ' . $e->getMessage());
         }
     }
 
     public function incrementClick(string $field, int $id, mixed $value): void
     {
-        $key = "$field-$id";
+        $key = "{$field}-{$id}";
         $this->clickCount[$key] = ($this->clickCount[$key] ?? 0) + 1;
 
         if ($this->clickCount[$key] === 4) {
@@ -96,15 +98,26 @@ class SiteSettingsController extends Component
             return;
         }
 
-        $this->validate([
-            $field => $this->rules[$field] ?? 'required',
+        // If the field exists in the rules, validate it
+        $validationRule = $this->rules[$field] ?? 'required';
+        
+        // Manually validate the input
+        $validator = Validator::make([$field => $this->editingValue], [
+            $field => $validationRule
         ]);
+    
+        if ($validator->fails()) {
+            session()->flash('error', 'Validation failed: ' . $validator->errors()->first());
+            return;
+        }
 
         $record->$field = $this->editingValue;
         $record->save();
 
         $this->editingField = null;
         $this->editingValue = '';
+
+        session()->flash('message', 'Saved successfully.');
     }
 
     public function delete(): void
@@ -140,7 +153,7 @@ class SiteSettingsController extends Component
         }
 
         return $query->orderBy($this->sortField, $this->sortDirection)
-                    ->paginate($this->perPage);
+            ->paginate($this->perPage);
     }
 
     private function formatReturn($query, $fillable): array
@@ -164,7 +177,6 @@ class SiteSettingsController extends Component
             ],
         ];
     }
-
 
     private function determineInputTypes(array $fillable): array
     {

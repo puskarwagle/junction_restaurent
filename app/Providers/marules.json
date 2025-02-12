@@ -45,5 +45,11 @@
             "date": "required|date|after_or_equal:today",
             "time": "required|date_format:H:i"
         }
+    },
+    "SiteSettingsController": {
+        "rules": {
+            "key": "required|string",
+            "value": "required|string"
+        }
     }
 }

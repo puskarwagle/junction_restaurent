@@ -222,7 +222,7 @@ class MakeCruds extends Command
     {
         if (file_exists($filePath)) {
             $this->info($existsMessage);
-            if ($this->confirm('Do you want to replace it?', false)) {
+            if ($this->confirm('Do you want to replace it?', true)) {
                 $this->info($generateMessage);
                 $generator();
                 $this->info($successMessage);

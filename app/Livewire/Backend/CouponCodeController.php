@@ -9,6 +9,7 @@ use Livewire\WithPagination;
 use Livewire\WithFileUploads;
 use Exception;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\View\View;
 
 class CouponCodeController extends Component
@@ -30,8 +31,8 @@ class CouponCodeController extends Component
     public $coupon;
     public $amount;
     public $expiration_date;
-    
-    protected array $rules = [
+
+    public array $rules = [
         'coupon' => 'required|string|unique:coupons,code|max:255',
         'amount' => 'required|numeric|min:0',
         'expiration_date' => 'required|date|after_or_equal:today'
@@ -68,14 +69,14 @@ class CouponCodeController extends Component
             $this->reset([...$this->fillableAttributes(), 'showCreateForm']);
             $this->calculateNextId();
         } catch (Exception $e) {
-            session()->flash('error', 'Failed to create ' . CouponCode . ': ' . $e->getMessage());
-            Log::error('Error creating ' . CouponCode . ': ' . $e->getMessage());
+            session()->flash('error', 'Failed to create CouponCode: ' . $e->getMessage());
+            Log::error('Error creating CouponCode: ' . $e->getMessage());
         }
     }
 
     public function incrementClick(string $field, int $id, mixed $value): void
     {
-        $key = "$field-$id";
+        $key = "{$field}-{$id}";
         $this->clickCount[$key] = ($this->clickCount[$key] ?? 0) + 1;
 
         if ($this->clickCount[$key] === 4) {
@@ -99,15 +100,26 @@ class CouponCodeController extends Component
             return;
         }
 
-        $this->validate([
-            $field => $this->rules[$field] ?? 'required',
+        // If the field exists in the rules, validate it
+        $validationRule = $this->rules[$field] ?? 'required';
+        
+        // Manually validate the input
+        $validator = Validator::make([$field => $this->editingValue], [
+            $field => $validationRule
         ]);
+    
+        if ($validator->fails()) {
+            session()->flash('error', 'Validation failed: ' . $validator->errors()->first());
+            return;
+        }
 
         $record->$field = $this->editingValue;
         $record->save();
 
         $this->editingField = null;
         $this->editingValue = '';
+
+        session()->flash('message', 'Saved successfully.');
     }
 
     public function delete(): void
@@ -143,7 +155,7 @@ class CouponCodeController extends Component
         }
 
         return $query->orderBy($this->sortField, $this->sortDirection)
-                    ->paginate($this->perPage);
+            ->paginate($this->perPage);
     }
 
     private function formatReturn($query, $fillable): array
@@ -167,7 +179,6 @@ class CouponCodeController extends Component
             ],
         ];
     }
-
 
     private function determineInputTypes(array $fillable): array
     {

@@ -9,6 +9,7 @@ use Livewire\WithPagination;
 use Livewire\WithFileUploads;
 use Exception;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\View\View;
 
 class UserController extends Component
@@ -31,9 +32,12 @@ class UserController extends Component
     public $email;
     public $type;
     public $password;
-    
-    protected array $rules = [
-        
+
+    public array $rules = [
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|unique:users,email|max:255',
+        'type' => 'required|string|in:admin,manager,user',
+        'password' => 'required|string|min:8|confirmed'
     ];
 
     public function mount(): void
@@ -67,14 +71,14 @@ class UserController extends Component
             $this->reset([...$this->fillableAttributes(), 'showCreateForm']);
             $this->calculateNextId();
         } catch (Exception $e) {
-            session()->flash('error', 'Failed to create ' . User . ': ' . $e->getMessage());
-            Log::error('Error creating ' . User . ': ' . $e->getMessage());
+            session()->flash('error', 'Failed to create User: ' . $e->getMessage());
+            Log::error('Error creating User: ' . $e->getMessage());
         }
     }
 
     public function incrementClick(string $field, int $id, mixed $value): void
     {
-        $key = "$field-$id";
+        $key = "{$field}-{$id}";
         $this->clickCount[$key] = ($this->clickCount[$key] ?? 0) + 1;
 
         if ($this->clickCount[$key] === 4) {
@@ -98,15 +102,26 @@ class UserController extends Component
             return;
         }
 
-        $this->validate([
-            $field => $this->rules[$field] ?? 'required',
+        // If the field exists in the rules, validate it
+        $validationRule = $this->rules[$field] ?? 'required';
+        
+        // Manually validate the input
+        $validator = Validator::make([$field => $this->editingValue], [
+            $field => $validationRule
         ]);
+    
+        if ($validator->fails()) {
+            session()->flash('error', 'Validation failed: ' . $validator->errors()->first());
+            return;
+        }
 
         $record->$field = $this->editingValue;
         $record->save();
 
         $this->editingField = null;
         $this->editingValue = '';
+
+        session()->flash('message', 'Saved successfully.');
     }
 
     public function delete(): void
@@ -142,7 +157,7 @@ class UserController extends Component
         }
 
         return $query->orderBy($this->sortField, $this->sortDirection)
-                    ->paginate($this->perPage);
+            ->paginate($this->perPage);
     }
 
     private function formatReturn($query, $fillable): array
@@ -166,7 +181,6 @@ class UserController extends Component
             ],
         ];
     }
-
 
     private function determineInputTypes(array $fillable): array
     {

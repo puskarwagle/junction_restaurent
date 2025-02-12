@@ -62,7 +62,7 @@
                         <td>
                             @if ($editingField === $field . '-' . $record['id'])
                             <input type="{{ $input_types[$field] ?? 'text' }}" 
-                                wire:model="editingValue" 
+                                wire:model.defer="editingValue" 
                                 class="form-control blendInputs" 
                                 placeholder="Enter {{ ucfirst($field) }}" 
                                 wire:blur="saveModifiedField('{{ $field }}', {{ $record['id'] }})">

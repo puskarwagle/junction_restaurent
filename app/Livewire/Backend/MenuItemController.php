@@ -44,7 +44,6 @@ class MenuItemController extends Component
         'image_path' => 'nullable|string',
         'description' => 'nullable|string',
         'type' => 'required|string|max:50',
-        'discount' => 'nullable|numeric|min:0|max:100',
         'is_special' => 'boolean'
     ];
 
@@ -79,8 +78,8 @@ class MenuItemController extends Component
             $this->reset([...$this->fillableAttributes(), 'showCreateForm']);
             $this->calculateNextId();
         } catch (Exception $e) {
-            session()->flash('error', 'Failed to create ' . 'MenuItem' . ': ' . $e->getMessage());
-            Log::error('Error creating ' . 'MenuItem' . ': ' . $e->getMessage());
+            session()->flash('error', 'Failed to create MenuItem: ' . $e->getMessage());
+            Log::error('Error creating MenuItem: ' . $e->getMessage());
         }
     }
 
@@ -98,19 +97,18 @@ class MenuItemController extends Component
 
     public function saveModifiedField(string $field, int $id): void
     {
-        Log::info("saveModifiedField triggered", [
-            'field' => $field,
-            'id' => $id,
-            'value' => $this->editingValue
-        ]);
-    
         $record = MenuItem::find($id);
-    
+
         if (!$record) {
             session()->flash('error', 'Record not found.');
             return;
         }
-    
+
+        if (!in_array($field, $record->getFillable(), true)) {
+            session()->flash('error', 'Field cannot be edited.');
+            return;
+        }
+
         // If the field exists in the rules, validate it
         $validationRule = $this->rules[$field] ?? 'required';
         
@@ -120,25 +118,19 @@ class MenuItemController extends Component
         ]);
     
         if ($validator->fails()) {
-            // Handle validation errors
             session()->flash('error', 'Validation failed: ' . $validator->errors()->first());
             return;
         }
-    
-        if (!in_array($field, $record->getFillable(), true)) {
-            session()->flash('error', 'Field cannot be edited.');
-            return;
-        }
-    
+
         $record->$field = $this->editingValue;
         $record->save();
-    
+
         $this->editingField = null;
         $this->editingValue = '';
-    
+
         session()->flash('message', 'Saved successfully.');
     }
-    
+
     public function delete(): void
     {
         if (!empty($this->selectedIds)) {
